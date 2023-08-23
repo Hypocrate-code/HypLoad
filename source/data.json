@@ -1,0 +1,40 @@
+{
+  "fr": {
+    "SS_label": "Bienvenue sur [color=#FF0000][font=Roboto-Bold]Hyp'Load[/font][/color],\nvotre application personnelle de\ntéléchargement de vidéo YouTube",
+    "SS_single_btn": "Télécharger une seule vidéo",
+    "SS_playlist_btn": "Télécharger une playlist",
+    "SS_my_playlists_btn":"Mes playlists sauvegardées",
+    "MSDS_validate_link_btn": "Télécharger",
+    "MSDS_label": "Entrez le lien de votre vidéo YouTube",
+    "POSM_fbtn": "Télécharger une seule vidéo",
+    "POSM_sbtn": "Télécharger une playlist",
+    "MPDS_label":"Entrez le lien de votre playlist YouTube",
+    "MPDS_validate_link_btn" : "Valider",
+    "SS_others_btn": "Options et infos",
+    "input_of_youtube_link": "Lien de votre vidéo YouTube",
+    "input_of_youtube_playlist_link":"Lien de votre playlist YouTube",
+    "OAIS_change_lang_btn": "Changer la langue",
+    "OAIS_how_btn":"Comment utiliser Hyp'Load ?",
+    "OAIS_change_res_btn": "Résolution des vidéos",
+    "OAIS_who_am_i":"Qui est Hypocrate ?"
+  },
+  "en": {
+   "SS_label": "Welcome to [color=#FF0000][font=Roboto-Bold]Hyp'Load[/font][/color],\nyour personnal Youtube\nvideo downloader.",
+    "SS_single_btn": "Download a single video",
+    "SS_playlist_btn": "Download a playlist",
+    "SS_my_playlists_btn": "My playlists saved",
+    "MSDS_validate_link_btn": "Download",
+    "MSDS_label": "Enter the link of your YouTube video",
+    "POSM_fbtn": "Download only one video",
+    "POSM_sbtn": "Download a playlist",
+    "MPDS_label": "Enter the link of your YouTube playlist",
+    "MPDS_validate_link_btn":"Validate",
+    "SS_others_btn": "Options and infos",
+    "input_of_youtube_link": "Your YouTube video's link",
+    "input_of_youtube_playlist_link": "Your YouTube playlist's link",
+    "OAIS_change_lang_btn": "Change the language",
+    "OAIS_how_btn":"How to use Hyp'Load ?",
+    "OAIS_change_res_btn": "Resolution of the videos",
+    "OAIS_who_am_i":"Who is Hypocrate ?"
+  }
+}
