@@ -1,0 +1,573 @@
+MainScreenManager:
+    LanguageScreen:
+    StartScreen:
+    MusicSingleDownloadScreen:
+    MusicPlaylistDownloadScreen:
+    OptionsAndInfosScreen:
+    ChooseResolutionScreen:
+    PlaylistScreen:
+    CustomResolutionScreen:
+        
+        
+<BackButton@AnchorLayout>:
+    size_hint: (None, None)
+    size: (app.p_to_dp(120),app.p_to_dp(120))
+    pos_hint: {'x': 0.04, 'top': 0.96}
+    BasicButton:
+        id: anchor_back_btn_no_trad
+        canvas.before:
+            Color:
+                rgba: app.background_of_the_app
+            RoundedRectangle:
+                size : self.size
+                pos: self.pos
+                radius: [dp(app.p_to_dp(16).split("dp")[0])]
+        on_press:
+            root.parent.parent.back_btn()
+    Image:
+        source: "assets/left-arrow.png"
+        background_color: (0.5,0.5,0.5,1)
+
+<BasicButton@Button>:
+    font_size: app.text_size("medium")
+    color: app.text_color
+    font_name: app.Roboto_font
+    background_normal: ""
+    background_color: (0 ,0 ,0 , 0)
+    canvas.before:
+        Color:
+            rgba: app.light_grey
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [self.height/2]
+<ButtonForList@Button>:
+    font_size: app.text_size("medium")
+    color: app.text_color
+    font_name: app.Roboto_font
+    background_color: (0 ,0 ,0 , 0)
+    size_hint_y: None
+    height: app.p_to_dp(135)
+    canvas.before:
+        Color:
+            rgba: app.light_grey
+        Rectangle:
+            size: self.size
+            pos: self.pos
+<BasicButtonRemake@Button>:
+    bg_color : (1,1,1,1)
+    font_size: app.text_size("medium")
+    color: app.text_color
+    font_name: app.Roboto_font
+    background_normal: ""
+    background_color: (0 ,0 ,0 , 0)
+    canvas.before:
+        Color:
+            rgba: self.bg_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [self.height/2]
+<ButtonForList@Button>:
+    font_size: app.text_size("medium")
+    color: app.text_color
+    font_name: app.Roboto_font
+    background_color: (0 ,0 ,0 , 0)
+    size_hint_y: None
+    height: app.p_to_dp(135)
+    canvas.before:
+        Color:
+            rgba: app.light_grey
+        Rectangle:
+            size: self.size
+            pos: self.pos
+<ButtonOnlyAudio@AnchorLayout>:
+    size_hint: (1,None)
+    height: app.p_to_dp(85)
+    RelativeLayout:
+        pos_hint: {"center_x":0.5}
+        size_hint_x: None
+        width: app.get_audio_only_text_and_width()[1]
+        Button:
+            id: only_audio_btn
+            font_name: app.Roboto_light_font
+            font_size: app.text_size("small medium")
+            padding: [app.p_to_dp(25), app.p_to_dp(5)]
+            text_size: self.size
+            halign:"right"
+            valign:"center"
+            text: app.get_audio_only_text_and_width()[0]
+            background_color: 0,0,0,0
+            color: app.text_color
+            canvas.before:
+                Color:
+                    rgba: app.light_grey
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [dp(app.p_to_dp(13).split("dp")[0])]
+            on_press:
+                app.switch_audio_only()
+                app.update_only_audio_btn()
+        Image:
+            id: image_of_audio_only_no_trad
+            source: app.get_audio_only_image()
+            pos_hint: {"x":0.055, "center_y":0.5}
+            size_hint_x: None
+            size_hint_y: None
+            width: app.p_to_dp(60)
+           
+    
+<ProgressBar>:
+    max: 100
+    opacity: 1
+
+
+
+<LanguageScreen>:
+    AnchorLayout:
+        size: root.width, root.height
+        anchor_x: 'center'
+        anchor_y: 'center'
+        GridLayout:
+            cols: 1
+            rows: 2
+            size_hint: (None, None)
+            spacing: app.p_to_dp(12)
+            size: (app.p_to_dp(300), app.p_to_dp(450))
+            BasicButton:
+                text: 'Français'
+                on_press:
+                    root.setLanguage('fr')
+                    
+                size_hint_y: 0.5
+            BasicButton:
+                text: 'English'
+                on_press:
+                    root.setLanguage('en')
+                    
+                size_hint_y: 0.5
+
+<StartScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        size: root.width, root.height
+        AnchorLayout:
+            anchor_x: "center"
+            anchor_y: "bottom"
+            size_hint_y: .6
+            Label:
+                id: SS_label
+                text : "Welcome to [color=#FF0000][font=Roboto-Bold]HypLoad[/font][/color], your personnal\nYoutube video downloader."
+                line_height: 1.3
+                halign: "center"
+                markup: True
+                color: app.text_color
+                font_size: app.text_size("medium big")
+                font_name: app.Roboto_font
+                size_hint_y: None
+                height: app.p_to_dp(400)
+        AnchorLayout:
+            anchor_x: "center"
+            anchor_y:"top"
+            GridLayout:
+                id: SS_grid_for_btn_no_trad
+                cols: 1
+                rows: 4
+                spacing: app.p_to_dp(35)
+                height: app.p_to_dp(700)
+                size_hint_y: None
+                size_hint_x: None
+                width: app.p_to_dp(750)
+                BasicButton:
+                    id: SS_single_btn
+                    text: "Download a single video"
+                    
+                    on_press:
+                        root.manager.current = 'music_single_download_screen'
+                BasicButton:
+                    id: SS_playlist_btn
+                    text: "Download a playlist"
+                    
+                    
+                    
+                    on_press:
+                        root.manager.current = "music_playlist_download_screen"
+                BasicButton:
+                    id: SS_my_playlists_btn
+                    text: "My playlists saved"
+                BasicButton:
+                    id: SS_others_btn
+                    text: "Options and infos"
+                    
+                    on_press:
+                        root.manager.current="options_and_infos_screen"
+
+
+<MusicSingleDownloadScreen>:
+    FloatLayout:
+        size: root.width, root.height
+        BackButton:
+
+        GridLayout:
+            pos_hint: {"center_x": 0.5, 'center_y': 0.52}
+            id: container_download_screen_no_trad
+            cols: 1
+            size_hint: (None, None)
+            size: (app.p_to_dp(800), app.p_to_dp(350))
+            spacing: app.p_to_dp(45)
+            Label:
+                id: MSDS_label
+                text: 'Enter the link of your YouTube playlist'
+                line_height: 1.3
+                halign: "center"
+                color: app.text_color
+                font_size: app.text_size("small medium")
+                font_name: app.Roboto_font
+            GridLayout:
+                id: enter_link_grid_no_trad
+                cols: 2
+                rows: 1
+                TextInput:
+                    font_name: app.Roboto_font
+                    hint_text: "Your YouTube video's link"
+                    id: input_of_youtube_link
+                    multiline: False
+                    background_normal: ''
+                    background_active: ''
+                    background_color: app.text_input_bg
+                    foreground_color: app.text_color
+                    font_size: app.p_to_dp(40)
+                    padding: [0,app.p_to_dp(19),app.p_to_dp(9.5),0]
+                    on_text_validate: root.download()
+                    canvas.after:
+                        Color:
+                            rgba: app.text_input_bg
+                        Ellipse:
+                            angle_start: 180
+                            angle_end: 360
+                            pos: (self.pos[0] - (self.height/2.4), self.pos[1])
+                            size: (self.height/1.2,self.height)
+                Button:
+                    id: MSDS_validate_link_btn
+                    text: 'Download'
+                    font_size: app.text_size("small medium")
+                    on_press: root.download()
+                    color: (1,1,1,1)
+                    background_normal: ""
+                    background_color : 0,0,0,0
+                    size_hint_x: None
+                    width: app.auto_width(self) + dp(app.p_to_dp(30).split("dp")[0])
+                    text_size: self.size
+                    halign:"right"
+                    valign:"center"
+                    canvas.before:
+                        Color:
+                            rgba: app.color(242, 0, 0, 255)
+                        Rectangle:
+                            size : self.size
+                            pos: self.pos
+                    canvas.after:
+                        Color:
+                            rgba: app.color(242, 0, 0, 255)
+                        Ellipse:
+                            angle_start: 0
+                            angle_end: 180
+                            pos: (self.pos[0] +self.width - (self.height/2.4), self.pos[1])
+                            size: (self.height/1.2,self.height)
+            ButtonOnlyAudio:
+                id: only_audio_btn_no_trad
+
+<MusicPlaylistDownloadScreen>:
+    FloatLayout:
+        size: root.width, root.height
+        BackButton:
+        GridLayout:
+            pos_hint: {"center_x": 0.5, 'center_y': 0.52}
+            id: container_playlist_download_screen_no_trad
+            cols: 1
+            rows: 3
+            size_hint: (None, None)
+            size: (app.p_to_dp(750), app.p_to_dp(320))
+            spacing: app.p_to_dp(30)
+            Label:
+                id: MPDS_label
+                text: 'Enter the link of your YouTube playlist'
+                color: app.text_color
+                font_size: app.text_size("small medium")
+                font_name: app.Roboto_font
+            GridLayout:
+                id: enter_playlist_link_grid_no_trad
+                cols: 2
+                rows: 1
+                TextInput:
+                    font_name: app.Roboto_font
+                    hint_text: "Your YouTube playlist's link"
+                    id: input_of_youtube_playlist_link
+                    multiline: False
+                    background_normal: ''
+                    background_active: ''
+                    background_color: app.text_input_bg
+                    foreground_color: app.text_color
+                    font_size: app.p_to_dp(40)
+                    padding: [app.p_to_dp(1),app.p_to_dp(19),app.p_to_dp(9.5),0]
+                    on_text_validate:
+                        root.download()
+                    canvas.after:
+                        Color:
+                            rgba: app.text_input_bg
+                        Ellipse:
+                            angle_start: 180
+                            angle_end: 360
+                            pos: (self.pos[0] - (self.height/2.4), self.pos[1])
+                            size: (self.height/1.2,self.height)
+                Button:
+                    id: MPDS_validate_link_btn
+                    text: 'Validate'
+                    on_press:
+                        root.download()
+                    color: (1,1,1,1)
+                    font_size: app.text_size("small medium")
+                    background_normal: ""
+                    background_color : 0,0,0,0
+                    size_hint_x: None
+                    width: app.p_to_dp(200)
+                    text_size: self.size
+                    halign:"right"
+                    valign:"center"
+                    canvas.before:
+                        Color:
+                            rgba: app.color(242, 0, 0, 255)
+                        Rectangle:
+                            size : self.size
+                            pos: self.pos
+                    canvas.after:
+                        Color:
+                            rgba: app.color(242, 0, 0, 255)
+                        Ellipse:
+                            angle_start: 0
+                            angle_end: 180
+                            pos: (self.pos[0] +self.width - (self.height/2.4), self.pos[1])
+                            size: (self.height/1.2,self.height)
+            ButtonOnlyAudio:
+                id:only_audio_btn_no_trad
+
+<PlaylistScreen>:
+    FloatLayout:
+        padding: [0, app.p_to_dp(30)]
+        size: root.width, root.height
+        GridLayout:
+            pos_hint:{"center_x":0.5, "y": 1 - (title_container_no_trad.height / root.height)}
+            id: title_container_no_trad
+            spacing: [app.p_to_dp(20)]
+            orientation: "lr-tb"
+            cols: 2
+            rows: 1
+            padding: [0, app.p_to_dp(70), app.p_to_dp(20),app.p_to_dp(30)]
+            size_hint: (None, None)
+            height: app.p_to_dp(180)
+            width: app.translate_dp_to_p(app.p_to_dp(850))
+            AnchorLayout:
+                size_hint_y: 1
+                width: app.p_to_dp(100)
+                pos_hint: {'x': 0.04, 'top': 0.96}
+                BasicButton:
+                    id: anchor_back_btn_no_trad
+                    canvas.before:
+                        Color:
+                            rgba: app.background_of_the_app
+                        RoundedRectangle:
+                            size : self.size
+                            pos: self.pos
+                            radius: [dp(app.p_to_dp(16).split("dp")[0])]
+                    on_press:
+                        root.back_btn()
+                Image:
+                    source: "assets/left-arrow.png"
+                    background_color: (0.5,0.5,0.5,1)
+
+
+
+        ScrollView:
+            pos_hint:{"center_x":0.5}
+            id: playlist_loaded_scroll_view_no_trad
+            size:(app.translate_dp_to_p(app.p_to_dp(850)),root.height - title_container_no_trad.height)
+            background_color: 0,1,0,1
+
+            size_hint: (None,None)
+            do_scroll_y: True
+            do_scroll_x: False
+            GridLayout:
+                spacing: app.p_to_dp(25)
+                id: playlist_loaded_no_trad
+                orientation:"tb-lr"
+                height: len(self.children) * (app.translate_dp_to_p(app.p_to_dp(215)) + self.spacing[0]) - self.spacing[0]
+                size_hint_y: None
+                cols:1
+        Button:
+            id: PS_btn_validate_download
+            background_normal: ''
+            background_active: ''
+            background_color: 0,0,0,0
+            pos_hint:{"center_x":0.5, "y": 0.02}
+            font_name: app.Roboto_font
+            font_size: app.text_size("medium big")
+            size_hint: (None, None)
+            width: playlist_loaded_scroll_view_no_trad.width - app.translate_dp_to_p(app.p_to_dp(50))
+            height: app.p_to_dp(150)
+            text: "Start downloading"
+            canvas.before:
+                Color:
+                    rgb: app.bg_color_for_video_res_btn
+                RoundedRectangle:
+                    radius: [app.translate_dp_to_p(app.p_to_dp(25))]
+                    pos: self.pos
+                    size: self.size
+
+
+
+<OptionsAndInfosScreen>:
+    FloatLayout:
+        size: root.width, root.height
+        
+        GridLayout:
+            id: OAIS_grid_container_no_trad
+            spacing: app.p_to_dp(35)
+            orientation:"tb-lr"
+            height: len(self.children) * (OAIS_change_lang_btn.height + self.spacing[0]) - self.spacing[0]
+            size_hint:(None,None)
+            width: app.p_to_dp(700)
+            cols:1
+            pos_hint:{"center_x":0.5,"center_y":0.505}
+            BasicButton:
+                id: color_mode_no_trad
+                on_press:
+                    root.change_color_mode()
+            
+            BasicButton:
+                id: OAIS_change_res_btn
+                text:"Resolution of the videos"
+                on_press:
+                    root.manager.transition.direction="left"
+                    root.manager.current = "choose_resolution_screen"
+            
+            BasicButton:
+                size_hint_y: None
+                height: app.p_to_dp(148.75)
+                id: OAIS_change_lang_btn
+                text:"Change the language"
+                on_press:
+                    root.manager.transition.direction = "left"
+                    root.manager.current="language_screen"
+            
+            BasicButton:
+                id: OAIS_how_btn
+                text:"How to use HypLoad ?"
+                on_press:
+                    app.open_web_page("https://github.com/Hypocrate-code/HypLoad/blob/main/README.md")
+            BasicButton:
+                id: OAIS_who_am_i
+                text: "Who is Hypocrate ?"
+                on_press:
+                    app.open_web_page("https://hypocrate-code.github.io/HypLoad/source/redirect.html")
+        BackButton:
+            
+            
+<ChooseResolutionScreen>:
+    FloatLayout:
+        size: root.width, root.height
+        GridLayout:
+            id: CRS_btn_container_no_trad
+            spacing: app.p_to_dp(70)
+            orientation:"tb-lr"
+            size_hint:(None,None)
+            height: CRS_label.height + self.spacing[0] +CRS_grid_of_btns_no_trad.height
+            width: app.p_to_dp(600)
+            cols:1
+            pos_hint: {"center_x":0.5,"center_y":0.505}
+            Label:
+                text: "Choose the resolution\nyou want your videos\nto be downloaded in"
+                id: CRS_label
+                color: app.text_color
+                font_size : app.text_size("medium big")
+                line_height: 1.3
+                halign: "center"
+                size_hint_y : None
+                height: 210
+                font_name: app.Roboto_font
+            GridLayout:
+                cols:1
+                spacing: app.p_to_dp(35)
+                id: CRS_grid_of_btns_no_trad
+                height: len(self.children) * (dp(app.p_to_dp(148.75).split("dp")[0])+ self.spacing[0]) - self.spacing[0]
+                BasicButtonRemake:
+                    id: CRS_highest_res
+                    text:"Highest resolution"
+                    on_press:  
+                        app.set_video_res("highest")
+                        root.set_video_res_btns()
+                BasicButtonRemake:
+                    id: CRS_lowest_res
+                    text:"Lowest resolution"
+                    on_press:  
+                        app.set_video_res("lowest")
+                        root.set_video_res_btns()
+                BasicButtonRemake:
+                    id: CRS_custom
+                    text: "Custom resolution"
+                    on_press:
+                        root.manager.transition.direction = "left"
+                        root.manager.current = "custom_resolution_screen"
+        BackButton:
+            
+<CustomResolutionScreen>:
+    FloatLayout:
+        size: root.width, root.height
+        GridLayout:
+            spacing: app.p_to_dp(35)
+            orientation:"tb-lr"
+            size_hint:(None,None)
+            height: len(self.children) * (dp(app.p_to_dp(148.75).split("dp")[0])+ self.spacing[0]) - self.spacing[0]
+            width: app.p_to_dp(500)
+            cols:1
+            pos_hint: {"center_x":0.5,"center_y":0.505}
+            Label:
+                text : "La vidéo ne sera pas téléchargée si\nla résolution n'est pas disponible"
+                line_height: 1.25
+                size_hint_y: None
+                height: app.p_to_dp(175)
+                halign:"center"
+                font_size: app.p_to_dp(47.5)
+                color: app.text_color
+            BasicButtonRemake:
+                text: "1080p"
+                on_press:  
+                    app.set_video_res(self.text)
+                    root.manager.get_screen("choose_resolution_screen").set_video_res_btns()
+            BasicButtonRemake:
+                text: "720p"
+                on_press:  
+                    app.set_video_res(self.text)
+                    root.manager.get_screen("choose_resolution_screen").set_video_res_btns()
+            BasicButtonRemake:
+                text:"480p"
+                on_press:  
+                    app.set_video_res(self.text)
+                    root.manager.get_screen("choose_resolution_screen").set_video_res_btns()
+            BasicButtonRemake:
+                text:"360p"
+                on_press:  
+                    app.set_video_res(self.text)
+                    root.manager.get_screen("choose_resolution_screen").set_video_res_btns()
+            BasicButtonRemake:
+                text:"240p"
+                on_press:  
+                    app.set_video_res(self.text)
+                    root.manager.get_screen("choose_resolution_screen").set_video_res_btns()
+
+            BasicButtonRemake:
+                text:"144p"
+                on_press:  
+                    app.set_video_res(self.text)
+                    root.manager.get_screen("choose_resolution_screen").set_video_res_btns()
+        BackButton:

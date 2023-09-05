@@ -4,8 +4,8 @@
 * [Français](#fr)
 ## <a id="en">English Traduction :</a>
 **HypLoad** is the app I created for quickly downloading all the videos and musics you want from YouTube.
-Don't wait and try it out !
-**Warning :**
+Don't wait and try it out !  
+**Warning :** 
 The app is only available on Android mobile for now.
 
 ### Downloading : 
@@ -26,7 +26,7 @@ You just have to download the **HypLoad.apk** file, and execute it to install th
 
 ## <a id="fr">Traduction Française :</a>
 **HypLoad** est une application que j'ai créée pour télécharger rapidement toutes les vidéos et musiques que vous souhaitez depuis YouTube.
-N'attendez pas et essayez là !
+N'attendez pas et essayez là !  
 **Attention :**
 L'application n'est actuellement disponible que sur les téléphones fonctionnant sous Android.
 
