@@ -16,7 +16,7 @@ You just have to download the **Hypload.apk** file, and execute it to install th
 * English and French traduction available
 * Choose the resolution of the video you download
 * Choose between downloading the video (image and audio) or only its audio (perfect for musics or podcasts)
-* Dark theme / Light theme
+* Dark theme / Light theme  
 **AVAILABLE SOON :**
 * Downloading whole playlist in one touch
 * Your playlists link are saved by the app for you to update them easily (videos added downloaded)
@@ -38,7 +38,7 @@ Vous n'avez qu'à télécharger le fichier **Hypload.apk** et l'exécuter pour i
 * Traduction Française et Anglaise disponible
 * Choisir la résolution des vidéos que vous téléchargez 
 * Choisir entre télécharger la vidéo (l'image et l'audio) ou simplement son audio (parfait pour la musique ou les podcasts)
-* Thème sombre / Thème clair
+* Thème sombre / Thème clair  
 **DISPONNIBLE BIENTÔT :**
 * Téléchargez vos playlists entièrement en un click
 * Les liens de vos playlists seront sauvegardées par l'application pour vous permettre de les mettre à jour simplement (télécharger les musiques ayant été ajoutées)
