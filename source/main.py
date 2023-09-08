@@ -9,6 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.anchorlayout import AnchorLayout
 import json
 from kivy.resources import resource_add_path, resource_find
 import threading
@@ -283,9 +284,10 @@ class MusicSingleDownloadScreen(Screen):
         pa.add_widget(second_rm)
         self.ids.input_of_youtube_link.text = ""
 from kivy.uix.button import Button
-from kivy.uix.image import AsyncImage
-
-
+from kivy.uix.image import Image, AsyncImage
+def change_img_only_audio(instance, source):
+    instance.type = "video" if instance.type == "audio" else "audio"
+    instance.parent.children[0].source = source.replace("audio", "film") if "audio" in source else source.replace("film", "audio")
 class Item_Of_List(GridLayout):
     def __init__(self, title, thumbnail, author, views, **kwargs):
         print(title)
@@ -300,10 +302,14 @@ class Item_Of_List(GridLayout):
             else:
                 prep = "by "
                 word = "views"
+            btn_img = f"assets/audio_{options_json['color_mode']}.png" if options_json["only_audio"] else f"assets/film_{options_json['color_mode']}.png"
+            checked_box = f"assets/checked_box_{options_json['color_mode']}.png"
+            not_checked_box = f"assets/not_checked_box_{options_json['color_mode']}.png"
         super(Item_Of_List, self).__init__(**kwargs)
         with self.canvas:
             Color(*app.light_grey)
             self.rect = RoundedRectangle(pos=self.pos, size=(self.size[0], self.size[1] - app.translate_dp_to_p(app.p_to_dp(7.5))), radius=[app.translate_dp_to_p(app.p_to_dp(25))])
+        self.type = "audio" if options_json["only_audio"] else "video"
         self.update = True
         self.orientation = "lr-tb"
         self.rows = 1
@@ -315,7 +321,7 @@ class Item_Of_List(GridLayout):
         self.thumbnail_img = AsyncImage(source = thumbnail, size_hint= (None, None))
         self.thumbnail_img.height = self.height - (self.padding[1] * 2)
         self.thumbnail_img.width = self.thumbnail_img.height / 0.75
-        self.container_of_data = GridLayout(orientation="tb-lr", cols=1, size_hint= (None, None),width = app.p_to_dp(480),  height= app.p_to_dp(170), padding = [0, app.p_to_dp(12)])
+        self.container_of_data = GridLayout(orientation="tb-lr", cols=1, size_hint= (None, None),width = app.p_to_dp(500),  height= app.p_to_dp(170), padding = [0, app.p_to_dp(12)])
 
 
         #### TITLE OF THE VIDEO, WIDGET IN PLAYLIST  ####
@@ -348,7 +354,7 @@ class Item_Of_List(GridLayout):
 
 
         ####  VIEWS OF THE VIDEO, WIDGET IN PLAYLIST  ####
-        self.views_counter = Label(text =f"{views} {word}")
+        self.views_counter = Label(text =f"{change_number_in_appropriate_form(views)} {word}")
         self.views_counter.height=app.p_to_dp(50)
         self.views_counter.valign="bottom"
         self.views_counter.halign = "left"
@@ -369,21 +375,36 @@ class Item_Of_List(GridLayout):
 
         #### LIL BUTTONS FOR PARAMETERS OF DOWNLOADS ####
         self.btns = FloatLayout(size_hint=(None, 1))
-        self.btns.width = app.p_to_dp(70)
+        self.btns.width = app.p_to_dp(50)
 
-        self.first_btn = Button()
+        self.first_btn = AnchorLayout()
         self.first_btn.size_hint = (1, None)
         self.first_btn.height = self.btns.width
         self.first_btn.pos_hint = {"center_x": 0.5, "center_y": 0.7}
-        self.first_btn.text = "1"
-        self.first_btn.font_size = app.p_to_dp(15)
+        # self.first_btn.text = "1"
+        # self.first_btn.font_size = app.p_to_dp(15)
+        self.first_btn.img = Image(source = btn_img)
+        self.first_btn.btn = Button()
+        self.first_btn.btn.background_active = ""
+        self.first_btn.btn.background_normal = ""
+        self.first_btn.btn.background_down = ""
+        self.first_btn.btn.background_color = 0,0,0,0
+        self.first_btn.btn.bind(on_press=lambda x: change_img_only_audio(x, self.first_btn.img.source))
+        self.first_btn.add_widget(self.first_btn.btn)
+        self.first_btn.add_widget(self.first_btn.img)
 
-        self.second_btn = Button()
+        self.second_btn = AnchorLayout()
         self.second_btn.size_hint = (1, None)
         self.second_btn.height = self.btns.width
-        self.second_btn.pos_hint = {"center_x": 0.5, "center_y": 0.25}
-        self.second_btn.text = "2"
-        self.second_btn.font_size = app.p_to_dp(15)
+        self.second_btn.pos_hint = {"center_x": 0.5, "center_y": 0.2}
+        self.second_btn.img = Image(source = not_checked_box if check_if_file_is_downloaded(title+".mp4", self.type) else checked_box)
+        self.second_btn.btn = Button()
+        self.second_btn.btn.background_active = ""
+        self.second_btn.btn.background_normal = ""
+        self.second_btn.btn.background_down = ""
+        self.second_btn.btn.background_color = 0, 0, 0, 0
+        self.second_btn.add_widget(self.second_btn.btn)
+        self.second_btn.add_widget(self.second_btn.img)
 
         self.btns.add_widget(self.first_btn)
         self.btns.add_widget(self.second_btn)
@@ -425,7 +446,7 @@ class MusicPlaylistDownloadScreen(Screen):
         label.size_hint= (None, 1)
         label.width=app.p_to_dp(700)
         label.valign="center"
-        label.font_size = app.p_to_dp(60)
+        label.font_size = app.p_to_dp(45)
         label.padding = [app.p_to_dp(18),app.p_to_dp(10)]
         label.text_size = label.size
         label.shorten = True
@@ -492,8 +513,6 @@ class my_progress_bar(Widget):
         self.bind(progress_value=self.update_progress)
     def update_progress(self, instance, value):
         self.progress_rect.size = (((self.par.size[0] - app.translate_dp_to_p( app.p_to_dp(15)))/100) * value, app.translate_dp_to_p(app.p_to_dp(20)))
-        print("bhfd")
-
 class OptionsAndInfosScreen(Screen):
     def on_pre_start(self, *args):
         sm.transition.direction = "left"
@@ -675,10 +694,10 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
 def download_yt_playlist(self, url, type):
     try:
         playlist = Playlist(url)
-        self.to_playlist_screen()
         self.add_title(playlist.title)
         for video in playlist.videos:
             self.add_a_video(video)
+        self.to_playlist_screen()
     except Exception as e:
         print(e)
 def convert_file_location(video, type):
@@ -697,7 +716,27 @@ def convert_file_location(video, type):
 ######END OF FUNCTIONS FOR ALL PYTUBE AND DOWNLOAD THINGS ##########
 
 ######START OF FUNCTIONS WITH LIL UTILITIES ##########
+def check_if_file_is_downloaded(source, type):
+    print(source)
+    if platform == "android":
+        Environment = autoclass('android.os.Environment')
+        if type == "music":
+            place_of_file = Environment.DIRECTORY_MUSIC
+        elif type == "video":
+            place_of_file = Environment.DIRECTORY_MOVIES
+        return source in os.listdir(place_of_file)
+    elif platform == "win" or platform == "linux":
+        print('win')
+        print(os.getcwd())
+        print(source in os.getcwd())
+        return source in os.listdir(os.getcwd())
 
+def change_number_in_appropriate_form(num):
+    number = str(num)
+    division_factor = (len(number)-1)//3
+    for i in range(division_factor):
+        number = number[:((i+1)*3+i)*(-1)] + ' ' + number[((i+1)*3 + i)*(-1):]
+    return number
 # def cut_text_or_not(text, lenght):
 #     print("ghfdohg", text[:lenght])
 #     return f"{text[:lenght]}..." if len(text[:lenght]) < len(text) else text
