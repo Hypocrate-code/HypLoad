@@ -389,9 +389,9 @@ MainScreenManager:
 
 
         ScrollView:
-            pos_hint:{"center_x":0.5}
+            pos_hint:{"center_x":0.5, "y": PS_btn_validate_download.height/root.height + 0.04}
             id: playlist_loaded_scroll_view_no_trad
-            size:(app.translate_dp_to_p(app.p_to_dp(850)),root.height - title_container_no_trad.height)
+            size:(app.translate_dp_to_p(app.p_to_dp(850)),root.height - title_container_no_trad.height - (PS_btn_validate_download.height + 0.04 * root.height))
             background_color: 0,1,0,1
 
             size_hint: (None,None)
@@ -416,9 +416,11 @@ MainScreenManager:
             width: playlist_loaded_scroll_view_no_trad.width - app.translate_dp_to_p(app.p_to_dp(50))
             height: app.p_to_dp(150)
             text: "Start downloading"
+            on_press:
+                root.launch_yt_playlist()
             canvas.before:
                 Color:
-                    rgb: app.bg_color_for_video_res_btn
+                    rgb: app.color(255, 44, 56, 190)
                 RoundedRectangle:
                     radius: [app.translate_dp_to_p(app.p_to_dp(25))]
                     pos: self.pos

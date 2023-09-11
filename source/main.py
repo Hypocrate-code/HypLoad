@@ -286,10 +286,15 @@ class MusicSingleDownloadScreen(Screen):
 from kivy.uix.button import Button
 from kivy.uix.image import Image, AsyncImage
 def change_img_only_audio(instance, source):
-    instance.type = "video" if instance.type == "audio" else "audio"
+    self = instance.parent.parent.parent
+    self.type = "video" if self.type == "audio" else "audio"
     instance.parent.children[0].source = source.replace("audio", "film") if "audio" in source else source.replace("film", "audio")
+    instance.parent.parent.children[0].children[0].source = self.not_checked_box if check_if_file_is_downloaded(make_a_filename(self.title), self.type) else self.checked_box
+def change_check_box_img(instance):
+    instance.second_btn.img.source = instance.checked_box if instance.second_btn.img.source == instance.not_checked_box else instance.not_checked_box
 class Item_Of_List(GridLayout):
     def __init__(self, title, thumbnail, author, views, **kwargs):
+        self.title = title
         print(title)
         print(thumbnail)
         print(views)
@@ -303,8 +308,8 @@ class Item_Of_List(GridLayout):
                 prep = "by "
                 word = "views"
             btn_img = f"assets/audio_{options_json['color_mode']}.png" if options_json["only_audio"] else f"assets/film_{options_json['color_mode']}.png"
-            checked_box = f"assets/checked_box_{options_json['color_mode']}.png"
-            not_checked_box = f"assets/not_checked_box_{options_json['color_mode']}.png"
+            self.checked_box = f"assets/checked_box_{options_json['color_mode']}.png"
+            self.not_checked_box = f"assets/not_checked_box_{options_json['color_mode']}.png"
         super(Item_Of_List, self).__init__(**kwargs)
         with self.canvas:
             Color(*app.light_grey)
@@ -325,7 +330,7 @@ class Item_Of_List(GridLayout):
 
 
         #### TITLE OF THE VIDEO, WIDGET IN PLAYLIST  ####
-        self.label = Label(text =f"{title.capitalize()}")
+        self.label = Label(text =f"{title}")
         self.label.height=app.p_to_dp(50)
         self.max_lines = 1
         self.label.valign="top"
@@ -395,14 +400,15 @@ class Item_Of_List(GridLayout):
 
         self.second_btn = AnchorLayout()
         self.second_btn.size_hint = (1, None)
-        self.second_btn.height = self.btns.width
-        self.second_btn.pos_hint = {"center_x": 0.5, "center_y": 0.2}
-        self.second_btn.img = Image(source = not_checked_box if check_if_file_is_downloaded(title+".mp4", self.type) else checked_box)
+        self.second_btn.height = self.btns.width * 0.88
+        self.second_btn.pos_hint = {"center_x": 0.48, "center_y": 0.25}
+        self.second_btn.img = Image(source = self.not_checked_box if check_if_file_is_downloaded(make_a_filename(title), self.type) else self.checked_box)
         self.second_btn.btn = Button()
         self.second_btn.btn.background_active = ""
         self.second_btn.btn.background_normal = ""
         self.second_btn.btn.background_down = ""
         self.second_btn.btn.background_color = 0, 0, 0, 0
+        self.second_btn.btn.bind(on_press=lambda y: change_check_box_img(self))
         self.second_btn.add_widget(self.second_btn.btn)
         self.second_btn.add_widget(self.second_btn.img)
 
@@ -424,14 +430,40 @@ class Item_Of_List(GridLayout):
 
 
 class MusicPlaylistDownloadScreen(Screen):
+    def on_enter(self, *args):
+        sm.transition.direction = "left"
+    def on_pre_enter(self, *args):
+        if getattr(self.children[0].children[0], "id", None) == "loading":
+            parent = sm.get_screen("music_playlist_download_screen").children[0]
+            parent.remove_widget(self.loading)
+            parent.remove_widget(self.pb)
+            parent.add_widget(self.container)
+
+    def on_leave(self, *args):
+        if getattr(self.children[0].children[0], "id", None) == "loading":
+            parent = sm.get_screen("music_playlist_download_screen").children[0]
+            parent.remove_widget(self.loading)
+            parent.remove_widget(self.pb)
+            parent.add_widget(self.container)
+
     def download(self):
         url = self.ids.input_of_youtube_playlist_link.text
-        # widget_to_remove = self.ids.enter_link_grid_no_trad
-        # widget_parent = self.ids.container_download_screen_no_trad
-        # widget_parent.remove_widget(widget_to_remove)
-        # progress_bar = ProgressBar()
-        # widget_parent.add_widget(progress_bar)
-        thread = threading.Thread(target=download_yt_playlist, args=[self, url, "music"])
+        self.container = self.ids.container_playlist_download_screen_no_trad
+        self.loading = Label(text="Loading your playlist...")
+        self.is_loading = True
+        self.loading.id = "loading"
+        self.loading.font_size = app.text_size("medium big")
+        self.loading.font_name = app.Roboto_font
+        self.loading.color = app.text_color
+        self.loading.pos_hint = {"center_y": 0.585}
+        self.loading.size_hint_y = None
+        self.loading.height = app.p_to_dp(100)
+        parent = sm.get_screen("music_playlist_download_screen").children[0]
+        parent.remove_widget(self.ids.container_playlist_download_screen_no_trad)
+        self.pb = my_progress_bar(self.ids.container_playlist_download_screen_no_trad)
+        parent.add_widget(self.pb)
+        parent.add_widget(self.loading)
+        thread = threading.Thread(target=init_yt_playlist, args=[self, url])
         thread.start()
 
     @mainthread
@@ -458,10 +490,13 @@ class MusicPlaylistDownloadScreen(Screen):
         parent = sm.get_screen('playlist_screen').ids.playlist_loaded_no_trad
         print(video_stream.views)
         widget = Item_Of_List(video_stream.title, f"https://img.youtube.com/vi/{video_stream.video_id}/0.jpg", video_stream.author, video_stream.views)
+        widget.stream = video_stream
         parent.add_widget(widget)
         widget.width = parent.width
     @mainthread
     def back_btn(self):
+        if getattr(self.children[0].children[0], "id", None) == "loading":
+            return False
         sm.transition.direction = "right"
         sm.current = "start_screen"
 
@@ -511,6 +546,7 @@ class my_progress_bar(Widget):
             Color(*app.bg_color_for_video_res_btn)
             self.progress_rect = RoundedRectangle(pos=(parent.pos[0] + app.translate_dp_to_p(app.p_to_dp(7.5)), parent.pos[1] + app.translate_dp_to_p(app.p_to_dp(162))), size=(((parent.size[0] - app.translate_dp_to_p( app.p_to_dp(10)))/100) * self.progress_value, app.translate_dp_to_p(app.p_to_dp(20))), radius=[ app.translate_dp_to_p(app.p_to_dp(10))])
         self.bind(progress_value=self.update_progress)
+    @mainthread
     def update_progress(self, instance, value):
         self.progress_rect.size = (((self.par.size[0] - app.translate_dp_to_p( app.p_to_dp(15)))/100) * value, app.translate_dp_to_p(app.p_to_dp(20)))
 class OptionsAndInfosScreen(Screen):
@@ -575,8 +611,45 @@ class OptionsAndInfosScreen(Screen):
         sm.current="start_screen"
 
 class PlaylistScreen(Screen):
+    def launch_yt_playlist(self):
+        launching_thread = threading.Thread(target=self.download_yt_playlist)
+        launching_thread.start()
+    def download_yt_playlist(self):
+        parent = sm.get_screen('playlist_screen').ids.playlist_loaded_no_trad
+        with open("options.json", "r") as options:
+            options_read = options.read()
+            options_json = json.loads(options_read)
+            resolution = options_json["video_res"]
+        if platform == "android":
+            for widget in parent.children :
+                print(widget.second_btn.img.source)
+                if "assets/checked_box" in widget.second_btn.img.source:
+                    if widget.type == "video":
+                        pass
+                    elif widget.type == "audio":
+                        good_one = widget.stream.streams.get_audio_only()
+                        name_of_file = "{0}.mp3".format(make_a_filename(good_one.title))
+                        good_one.download(filename=name_of_file)
+                        convert_file_location(name_of_file, widget.type)
+                    else:
+                        print(widget.type)
+        elif platform == "win" or platform == "linux":
+            for widget in parent.children :
+                print(widget.second_btn.img.source)
+                if "assets/checked_box" in widget.second_btn.img.source:
+                    if widget.type == "video":
+                        pass
+                    elif widget.type == "audio":
+                        good_one = widget.stream.streams.get_audio_only()
+                        good_one.download(filename="{0}.mp3".format(make_a_filename(good_one.title)),output_path=f"musics_for_pc_users")
+                    else:
+                        print(widget.type)
+
+
     def on_leave(self, *args):
         self.ids.playlist_loaded_no_trad.children = []
+        print(self.ids.title_container_no_trad)
+        self.ids.title_container_no_trad.remove_widget(self.ids.title_container_no_trad.children[0])
     def back_btn(self):
         sm.transition.direction ="right"
         sm.current="music_playlist_download_screen"
@@ -646,10 +719,10 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
             yt.register_on_progress_callback(self.on_progress)
             yt.register_on_complete_callback(self.on_complete)
             options = check_dl_preferencies_single()
-            options = check_dl_preferencies_single()
             print(options)
             if options[0]:
                 good_one = yt.streams.get_audio_only()
+                file_name ="{0}.mp3".format(make_a_filename(good_one.title))
             else:
                 if options[1] == "highest":
                     good_one = yt.streams.get_highest_resolution()
@@ -667,14 +740,22 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                     good_one = yt.streams.get_by_itag(22)
                 elif options[1] == "1080p":
                     good_one = yt.streams.get_by_itag(37)
-
-            good_one.download(output_path=os.getcwd())
-
+                file_name="{0}.mp4".format(make_a_filename(good_one.title))
             if platform == "android":
+                good_one.download(filename=file_name)
                 if options[0]:
-                    convert_file_location(good_one.default_filename, "music")
+                    convert_file_location(file_name, "audio")
                 else:
-                    convert_file_location(good_one.default_filename, "video")
+                    convert_file_location(file_name, "video")
+            elif platform == "win" or platform == "linux":
+                if options[0]:
+                    good_one.download(filename=file_name, output_path="musics_for_pc_users")
+                else:
+                    good_one.download(filename=file_name, output_path="videos_for_pc_users")
+
+
+
+
         except Exception as e:
             self.cancel_or_finish(first_to_rm,second_to_rm, parent, pb, "cancel")
             print("exception", e)
@@ -689,57 +770,81 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
             options_read = options.read()
             options_json = json.loads(options_read)
             self.ids.MSDS_label.text = "Votre lien est incorrect, vérifiez et réessayer." if options_json['language'] == 'fr' else "Your link is incorrect, verify and retry."
-
-
-def download_yt_playlist(self, url, type):
+def init_yt_playlist(self, url):
     try:
         playlist = Playlist(url)
+        percent = 100/(len(playlist.videos)+2)
+        total = percent
+        self.pb.update_progress(None, total)
         self.add_title(playlist.title)
+        total += percent
+        self.pb.update_progress(None, total)
         for video in playlist.videos:
             self.add_a_video(video)
+            total += percent
+            self.pb.update_progress(None, total)
         self.to_playlist_screen()
     except Exception as e:
         print(e)
-def convert_file_location(video, type):
+
+def convert_file_location(file, type):
     try:
         Environment = autoclass('android.os.Environment')
-        if type == "music":
-            place_of_file = Environment.DIRECTORY_MUSIC
+        if type == "audio":
+            folder = Environment.DIRECTORY_MUSIC + "/HypLoad"
         elif type == "video":
-            place_of_file = Environment.DIRECTORY_MOVIES
+            folder = Environment.DIRECTORY_MOVIES + "/HypLoad"
+        place_of_file = os.path.join(Environment.getExternalStorageDirectory().getAbsolutePath(), folder, "HypLoad")
+        if not os.path.exists(place_of_file):
+            os.mkdir(place_of_file)
         SS = SharedStorage()
         print(place_of_file)
-        SS.copy_to_shared(os.path.join(os.getcwd(), video), collection=place_of_file)
+        SS.copy_to_shared(os.path.join(os.getcwd(), file), collection=folder)
+        print(os.listdir(folder))
+        os.remove(file)
+        print(os.listdir(os.getcwd()))
     except Exception as e:
         print("oh !", e)
 
 ######END OF FUNCTIONS FOR ALL PYTUBE AND DOWNLOAD THINGS ##########
 
 ######START OF FUNCTIONS WITH LIL UTILITIES ##########
-def check_if_file_is_downloaded(source, type):
-    print(source)
+def check_if_file_is_downloaded(title, type):
     if platform == "android":
         Environment = autoclass('android.os.Environment')
-        if type == "music":
-            place_of_file = Environment.DIRECTORY_MUSIC
+        if type == "audio":
+            folder = Environment.DIRECTORY_MUSIC
+            source = title + ".mp3"
         elif type == "video":
-            place_of_file = Environment.DIRECTORY_MOVIES
+            folder = Environment.DIRECTORY_MOVIES
+            source = title + ".mp4"
+        place_of_file = os.path.join(Environment.getExternalStorageDirectory().getAbsolutePath(), folder, "HypLoad")
+        if not os.path.exists(place_of_file):
+            os.mkdir(place_of_file)
+        print(type)
+        print(place_of_file)
+        print(os.listdir(place_of_file))
         return source in os.listdir(place_of_file)
     elif platform == "win" or platform == "linux":
-        print('win')
-        print(os.getcwd())
-        print(source in os.getcwd())
-        return source in os.listdir(os.getcwd())
+        print("le titre est ", title, " et le type est ", type)
+        if type == "audio":
+            source = title + ".mp3"
+        elif type == "video":
+            source = title + ".mp4"
+        print("la source est ", source)
+        print("renvoie ", source in os.listdir("musics_for_pc_users"))
+        print("'pourtant : ",os.listdir("musics_for_pc_users"))
+        return source in os.listdir("musics_for_pc_users")  if type == "audio" else source in os.listdir("videos_for_pc_users")
 
+
+def make_a_filename(str):
+    return str.replace('\\', '').replace(":", "").replace('/', '').replace('<', '').replace('>', '').replace('*', '').replace('?', '').replace('"', '').replace('|', '')
 def change_number_in_appropriate_form(num):
     number = str(num)
     division_factor = (len(number)-1)//3
     for i in range(division_factor):
         number = number[:((i+1)*3+i)*(-1)] + ' ' + number[((i+1)*3 + i)*(-1):]
     return number
-# def cut_text_or_not(text, lenght):
-#     print("ghfdohg", text[:lenght])
-#     return f"{text[:lenght]}..." if len(text[:lenght]) < len(text) else text
 
 ######END OF FUNCTIONS WITH LIL UTILITIES ##########
 
