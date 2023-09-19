@@ -1,8 +1,12 @@
+import subprocess
 import os
 import time
-
+from urllib.error import URLError
+from multiprocessing import cpu_count
+from multiprocessing import active_children
 from kivy.config import Config
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen, ScreenManager, NoTransition, SlideTransition
 from kivy.uix.widget import Widget
@@ -20,7 +24,6 @@ from kivy.properties import ListProperty, NumericProperty
 from kivy.graphics import Color, RoundedRectangle
 from kivy.metrics import dp
 import webbrowser
-
 ############# setup basic settings###############
 # Config.set('kivy', 'show_touches', 0)
 import ssl
@@ -30,6 +33,7 @@ print(platform)
 
 if platform == "android":
     from jnius import autoclass
+    ffmpeg = autoclass('com.sahib.pyff.ffpy')
     from android.permissions import request_permissions, Permission
     from androidstorage4kivy import SharedStorage
     # from kivy.metrics import Metrics
@@ -52,6 +56,7 @@ if platform == "android":
     elif width >= 4.5 and width < 5:
         scale_factor = 0.9
 elif platform == "win" or platform == "linux":
+    import ffmpeg
     Window.fullscreen = 'auto'
     dpi = Window.dpi
     print("the screen's dpi is : ", dpi)
@@ -131,17 +136,18 @@ class HypLoadApp(App):
     def build(self):
         sm.add_widget(LanguageScreen(name='language_screen'))
         sm.add_widget(StartScreen(name='start_screen'))
-
-        return sm
-    def on_start(self):
-        from kivy.base import EventLoop
-        EventLoop.window.bind(on_keyboard=self.hook_keyboard)
         sm.add_widget(MusicSingleDownloadScreen(name='music_single_download_screen'))
         sm.add_widget(MusicPlaylistDownloadScreen(name='music_playlist_download_screen'))
         sm.add_widget(OptionsAndInfosScreen(name="options_and_infos_screen"))
         sm.add_widget(ChooseResolutionScreen(name="choose_resolution_screen"))
         sm.add_widget(PlaylistScreen(name="playlist_screen"))
         sm.add_widget(CustomResolutionScreen(name="custom_resolution_screen"))
+        self.icon = "assets/hypload_icon.png"
+        self.wait = False
+        return sm
+    def on_start(self):
+        from kivy.base import EventLoop
+        EventLoop.window.bind(on_keyboard=self.hook_keyboard)
         sm.get_screen("options_and_infos_screen").get_and_set_color_of_the_app()
         sm.get_screen("choose_resolution_screen").set_video_res_btns()
         self.only_audio_btns = []
@@ -251,7 +257,7 @@ class MusicSingleDownloadScreen(Screen):
         bytes_downloaded = total_size - bytes_remaining
         progress_value = (bytes_downloaded / total_size) * 100
         print(progress_value)
-        self.progress_bar.progress_value = progress_value
+        self.progress_bar.update_progress(None, progress_value)
     @mainthread
     def on_complete(self, stream, filepath, *args):
         widget_parent = self.ids.container_download_screen_no_trad
@@ -270,9 +276,10 @@ class MusicSingleDownloadScreen(Screen):
 
     @mainthread
     def cancel_or_finish(self, first_rm, second_rm, pa, pb, arg):
+        if first_rm.parent or second_rm.parent:
+            return
         if arg == "finish":
-            self.progress_bar.progress_value = 100
-            time.sleep(.3)
+            self.progress_bar.update_progress(None, 100)
             with open("options.json") as options:
                 options_read = options.read()
                 options_json = json.loads(options_read)
@@ -445,6 +452,8 @@ class MusicPlaylistDownloadScreen(Screen):
             parent.remove_widget(self.loading)
             parent.remove_widget(self.pb)
             parent.add_widget(self.container)
+        else:
+            sm.get_screen("music_playlist_download_screen").children[0].children[0].children[1].children[1].text = ""
 
     def download(self):
         url = self.ids.input_of_youtube_playlist_link.text
@@ -461,11 +470,27 @@ class MusicPlaylistDownloadScreen(Screen):
         parent = sm.get_screen("music_playlist_download_screen").children[0]
         parent.remove_widget(self.ids.container_playlist_download_screen_no_trad)
         self.pb = my_progress_bar(self.ids.container_playlist_download_screen_no_trad)
-        parent.add_widget(self.pb)
-        parent.add_widget(self.loading)
-        thread = threading.Thread(target=init_yt_playlist, args=[self, url])
+        thread = threading.Thread(target=init_yt_playlist, args=[self, url, parent, self.container, self.pb, self.loading])
         thread.start()
-
+    @mainthread
+    def init_interface(self, pa, pb, loading):
+        pa.add_widget(pb)
+        pa.add_widget(loading)
+    @mainthread
+    def cancel_or_finish(self, pa, container, pb, loading, type):
+        pa.remove_widget(pb)
+        pa.remove_widget(loading)
+        with open('options.json', 'r', encoding="utf-8") as options:
+            options_read = options.read()
+            options_json = json.loads(options_read)
+            if type == "error":
+                container.children[2].text = "Une erreur est survenue, votre lien est invalide." if options_json["language"] == "fr" else "An error occured, your link is invalid."
+            elif type == "finish" :
+                container.children[2].text = "Entrez le lien de votre playlist YouTube" if options_json["language"] == "fr" else "Enter the link of your YouTube playlist"
+            elif type == "internet_error":
+                container.children[2].text = "Probablement pas de connexion internet." if options_json["language"] == "fr" else "Probably no internet connexion."
+        container.children[1].children[1].text = ""
+        pa.add_widget(container)
     @mainthread
     def to_playlist_screen(self):
         sm.current = "playlist_screen"
@@ -614,8 +639,22 @@ class PlaylistScreen(Screen):
     def launch_yt_playlist(self):
         launching_thread = threading.Thread(target=self.download_yt_playlist)
         launching_thread.start()
+    @mainthread
+    def init_pb(self):
+        screen = sm.get_screen("music_playlist_download_screen")
+        print(screen.children[0])
+        print(screen.children[0].children[0])
+        print(screen.children[0].children[0].children)
+        screen.children[0].children[0].remove_widget(screen.children[0].children[0].children[1])
+        screen.children[0].children[0].remove_widget(screen.children[0].children[0].children[0])
+        self.actual_pb = my_progress_bar(screen.children[0].children[0])
+        self.actual_pb.update_progress(None, 100)
+        screen.children[0].children[0].add_widget(self.actual_pb)
     def download_yt_playlist(self):
         parent = sm.get_screen('playlist_screen').ids.playlist_loaded_no_trad
+        self.init_pb()
+        self.back_btn()
+        return
         with open("options.json", "r") as options:
             options_read = options.read()
             options_json = json.loads(options_read)
@@ -631,8 +670,6 @@ class PlaylistScreen(Screen):
                         name_of_file = "{0}.mp3".format(make_a_filename(good_one.title))
                         good_one.download(filename=name_of_file)
                         convert_file_location(name_of_file, widget.type)
-                    else:
-                        print(widget.type)
         elif platform == "win" or platform == "linux":
             for widget in parent.children :
                 print(widget.second_btn.img.source)
@@ -650,6 +687,7 @@ class PlaylistScreen(Screen):
         self.ids.playlist_loaded_no_trad.children = []
         print(self.ids.title_container_no_trad)
         self.ids.title_container_no_trad.remove_widget(self.ids.title_container_no_trad.children[0])
+    @mainthread
     def back_btn(self):
         sm.transition.direction ="right"
         sm.current="music_playlist_download_screen"
@@ -707,74 +745,125 @@ def check_dl_preferencies_single():
             return [False, options_json["video_res"]]
 def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
     try:
+        if app.wait:
+            raise OSError
         yt = YouTube(url)
-        if yt.title + ".mp4" in os.listdir(os.getcwd()):
+        options = check_dl_preferencies_single()
+        if check_if_file_is_downloaded(make_a_filename(yt.title), "audio" if options[0] else "video"):
             raise FileExistsError
         try:
             self.init_progress_bar(first_to_rm, second_to_rm, parent, pb)
-            with open("options.json") as options:
-                options_read = options.read()
+            with open("options.json") as file:
+                options_read = file.read()
                 options_json = json.loads(options_read)
                 self.ids.MSDS_label.text = f"Télécharge : {yt.title[:18]}..." if options_json['language'] == 'fr' else f"Downloading : {yt.title[:18]}..."
             yt.register_on_progress_callback(self.on_progress)
             yt.register_on_complete_callback(self.on_complete)
-            options = check_dl_preferencies_single()
-            print(options)
+            for stream in yt.streams:
+                print(stream)
             if options[0]:
                 good_one = yt.streams.get_audio_only()
                 file_name ="{0}.mp3".format(make_a_filename(good_one.title))
             else:
+                need_audio = False
                 if options[1] == "highest":
                     good_one = yt.streams.get_highest_resolution()
                 elif options[1] == "lowest":
                     good_one = yt.streams.get_lowest_resolution()
                 elif options[1] == "144p":
                     good_one = yt.streams.get_by_itag(160)
+                    need_audio = True
                 elif options[1] == "240p":
                     good_one = yt.streams.get_by_itag(133)
+                    need_audio = True
                 elif options[1] == "360p":
                     good_one = yt.streams.get_by_itag(18)
+                    need_audio = True
                 elif options[1] == "480p":
+                    need_audio = True
                     good_one = yt.streams.get_by_itag(135)
                 elif options[1] == "720p":
                     good_one = yt.streams.get_by_itag(22)
                 elif options[1] == "1080p":
-                    good_one = yt.streams.get_by_itag(37)
-                file_name="{0}.mp4".format(make_a_filename(good_one.title))
-            if platform == "android":
-                good_one.download(filename=file_name)
-                if options[0]:
-                    convert_file_location(file_name, "audio")
-                else:
-                    convert_file_location(file_name, "video")
-            elif platform == "win" or platform == "linux":
-                if options[0]:
+                    good_one = yt.streams.get_by_itag(137)
+                    need_audio = True
+                file_name="videos_for_pc_users/{0}.mp4".format(make_a_filename(good_one.title)) if platform == "win" or platform == "linux" else "{0}.mp4".format(make_a_filename(good_one.title))
+            if options[0]:
+                if platform == "android":
+                    good_one.download(filename=file_name)
+                elif platform == "win" or platform == "linux":
                     good_one.download(filename=file_name, output_path="musics_for_pc_users")
+            else:
+                if need_audio:
+                    app.wait = True
+                    try:
+                        good_one.download(filename="video.mp4")
+                        audio_for_merge = yt.streams.get_audio_only()
+                        audio_for_merge.download(filename="audio.mp3")
+                        ffmpeg_command = [
+                            'ffmpeg',
+                            '-i', os.getcwd()+"/video.mp4",
+                            '-i', os.getcwd()+"/audio.mp3",
+                            '-c:v', 'copy',
+                            '-c:a', 'aac',
+                            '-strict', 'experimental',
+                            "videos_for_pc_users/video.mp4"
+                        ]
+                        print(ffmpeg_command)
+                        if platform == "win" or platform == "linux":
+                            print("test1")
+                            subprocess.run("ffmpeg -i video.mp4 video.mov")
+                            print("test2")
+                        elif platform == "android":
+                            ffmpeg.Run(ffmpeg_command)
+                            os.listdir(os.getcwd())
+                        app.wait = False
+                    except Exception as e:
+                        print(e)
+                        # to_be_sure()
+                        app.wait = False
                 else:
-                    good_one.download(filename=file_name, output_path="videos_for_pc_users")
-
-
-
+                    if platform == "android":
+                        good_one.download(filename=file_name)
+                        convert_file_location(file_name, "video")
+                    elif platform == "win" or platform == "linux":
+                        good_one.download(filename=file_name, output_path="videos_for_pc_users")
 
         except Exception as e:
             self.cancel_or_finish(first_to_rm,second_to_rm, parent, pb, "cancel")
             print("exception", e)
+    except URLError:
+        reset_text(self.ids.input_of_youtube_link)
+        with open("options.json") as options:
+            options_read = options.read()
+            options_json = json.loads(options_read)
+            self.ids.MSDS_label.text = "Probablement pas de connexion internet." if options_json[
+                                                                                          "language"] == "fr" else "Probably no internet connexion."
     except FileExistsError:
+        reset_text(self.ids.input_of_youtube_link)
         with open("options.json") as options:
             options_read = options.read()
             options_json = json.loads(options_read)
             self.ids.MSDS_label.text = "La vidéo a déjà été téléchargée." if options_json['language'] == 'fr' else "This video has already been downloaded."
+    except OSError:
+        reset_text(self.ids.input_of_youtube_link)
+        with open("options.json") as options:
+            options_read = options.read()
+            options_json = json.loads(options_read)
+            self.ids.MSDS_label.text = "Finalisation du téléchargement précédent.\n(peut prendre quelques minutes)" if options_json['language'] == 'fr' else "Waiting for the previous download to end\n(can take a few minutes)"
     except Exception as e:
         print('marche pas', e)
+        reset_text(self.ids.input_of_youtube_link)
         with open("options.json") as options:
             options_read = options.read()
             options_json = json.loads(options_read)
             self.ids.MSDS_label.text = "Votre lien est incorrect, vérifiez et réessayer." if options_json['language'] == 'fr' else "Your link is incorrect, verify and retry."
-def init_yt_playlist(self, url):
+def init_yt_playlist(self, url, pa, base_container, pb, loading):
     try:
         playlist = Playlist(url)
-        percent = 100/(len(playlist.videos)+2)
-        total = percent
+        self.init_interface(pa, pb, loading)
+        percent = 50/(len(playlist.videos)+1)
+        total = 50
         self.pb.update_progress(None, total)
         self.add_title(playlist.title)
         total += percent
@@ -783,9 +872,17 @@ def init_yt_playlist(self, url):
             self.add_a_video(video)
             total += percent
             self.pb.update_progress(None, total)
+            time.sleep(.005)
         self.to_playlist_screen()
+        self.cancel_or_finish(pa, base_container, pb, loading, "finish")
+    except URLError:
+        self.cancel_or_finish(pa, base_container, pb, loading, "internet_error")
+    except KeyError:
+        self.cancel_or_finish(pa, base_container, pb, loading, "error")
     except Exception as e:
-        print(e)
+        print("wtff", e)
+        print("wtff", type(e))
+        self.cancel_or_finish(pa, base_container, pb, loading, "error")
 
 def convert_file_location(file, type):
     try:
@@ -809,6 +906,14 @@ def convert_file_location(file, type):
 ######END OF FUNCTIONS FOR ALL PYTUBE AND DOWNLOAD THINGS ##########
 
 ######START OF FUNCTIONS WITH LIL UTILITIES ##########
+@mainthread
+def reset_text(el):
+    el.text = ""
+def to_be_sure():
+    if "audio.mp3" in os.listdir(os.getcwd()):
+        os.remove("audio.mp3")
+    if "video.mp4" in os.listdir(os.getcwd()):
+        os.remove("video.mp4")
 def check_if_file_is_downloaded(title, type):
     if platform == "android":
         Environment = autoclass('android.os.Environment')

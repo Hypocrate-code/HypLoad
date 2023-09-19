@@ -37,8 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy==2.1.0, git+https://github.com/Hypocrate-code/pytube.git, androidstorage4kivy, pytube3==9.6.4
-
+requirements = python3, kivy==2.1.0, git+https://github.com/Hypocrate-code/pytube.git, androidstorage4kivy, pytube3==9.6.4, jnius
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
@@ -103,7 +102,7 @@ android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 android.api = 34
 
 # (int) Minimum API your APK / AAB will support.
-#android.minapi = 28
+android.minapi = 24
 
 # (int) Android SDK version to use
 #android.sdk = 34
@@ -172,14 +171,14 @@ android.api = 34
 # their classes. Don't add jars that you do not need, since extra jars can slow
 # down the build process. Allows wildcards matching, for example:
 # OUYA-ODK/libs/*.jar
-#android.add_jars = foo.jar,bar.jar,path/to/more/*.jar
+android.add_jars = smart-exception-common-0.2.1.jar, smart-exception-java-0.2.1.jar
 
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
 #android.add_src =
 
 # (list) Android AAR archives to add
-#android.add_aars =
+android.add_aars = ffmpeg-kit-release.aar
 
 # (list) Put these files or directories in the apk assets directory.
 # Either form may be used, and assets need not be in 'source.include_exts'.
