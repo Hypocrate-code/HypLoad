@@ -33,6 +33,7 @@ print(platform)
 
 if platform == "android":
     from jnius import autoclass
+    ffmpeg = autoclass('com.sahib.pyff.ffpy')
     from android.permissions import request_permissions, Permission
     from androidstorage4kivy import SharedStorage
     # from kivy.metrics import Metrics
@@ -55,6 +56,7 @@ if platform == "android":
     elif width >= 4.5 and width < 5:
         scale_factor = 0.9
 elif platform == "win" or platform == "linux":
+    import ffmpeg
     Window.fullscreen = 'auto'
     dpi = Window.dpi
     print("the screen's dpi is : ", dpi)
@@ -799,6 +801,7 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                         audio_for_merge = yt.streams.get_audio_only()
                         audio_for_merge.download(filename="audio.mp3")
                         ffmpeg_command = [
+<<<<<<< HEAD
                             'ffmpeg.exe',
                             '-i', "video.mp4",
                             '-i', "audio.mp3",
@@ -819,6 +822,28 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                     except Exception as e:
                         print(e)
                         to_be_sure()
+=======
+                            'ffmpeg',
+                            '-i', os.getcwd()+"/video.mp4",
+                            '-i', os.getcwd()+"/audio.mp3",
+                            '-c:v', 'copy',
+                            '-c:a', 'aac',
+                            '-strict', 'experimental',
+                            "videos_for_pc_users/video.mp4"
+                        ]
+                        print(ffmpeg_command)
+                        if platform == "win" or platform == "linux":
+                            print("test1")
+                            subprocess.run("ffmpeg -i video.mp4 video.mov")
+                            print("test2")
+                        elif platform == "android":
+                            ffmpeg.Run(ffmpeg_command)
+                            os.listdir(os.getcwd())
+                        app.wait = False
+                    except Exception as e:
+                        print(e)
+                        # to_be_sure()
+>>>>>>> a8fec358b46f0b626b479ea43bb501bc040189ea
                         app.wait = False
                 else:
                     if platform == "android":
