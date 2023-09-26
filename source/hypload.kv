@@ -529,15 +529,16 @@ MainScreenManager:
             spacing: app.p_to_dp(35)
             orientation:"tb-lr"
             size_hint:(None,None)
-            height: len(self.children) * (dp(app.p_to_dp(148.75).split("dp")[0])+ self.spacing[0]) - self.spacing[0]
+            height: (len(self.children)-1) * (app.translate_dp_to_p(app.p_to_dp(148.75)) + self.spacing[0]) - self.spacing[0] + app.translate_dp_to_p(app.p_to_dp(255))
             width: app.p_to_dp(500)
             cols:1
             pos_hint: {"center_x":0.5,"center_y":0.505}
             Label:
+                id: CHRS_label
                 text : "La vidéo ne sera pas téléchargée si\nla résolution n'est pas disponible"
                 line_height: 1.25
                 size_hint_y: None
-                height: app.p_to_dp(175)
+                height: app.p_to_dp(255)
                 halign:"center"
                 font_size: app.p_to_dp(47.5)
                 color: app.text_color
