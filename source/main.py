@@ -1,7 +1,7 @@
 import subprocess
 import os
 import time
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 from multiprocessing import cpu_count
 from multiprocessing import active_children
 from kivy.config import Config
@@ -30,10 +30,12 @@ import ssl
 ssl._create_default_https_context = ssl._create_stdlib_context
 
 print(platform)
+print(os.listdir(os.getcwd()))
 
 if platform == "android":
     from jnius import autoclass
-    ffmpeg = autoclass('com.sahib.pyff.ffpy')
+    from jnius import *
+    ffmpeg_for_android = autoclass('com.sahib.pyff.ffpy')
     from android.permissions import request_permissions, Permission
     from androidstorage4kivy import SharedStorage
     # from kivy.metrics import Metrics
@@ -56,7 +58,6 @@ if platform == "android":
     elif width >= 4.5 and width < 5:
         scale_factor = 0.9
 elif platform == "win" or platform == "linux":
-    import ffmpeg
     Window.fullscreen = 'auto'
     dpi = Window.dpi
     print("the screen's dpi is : ", dpi)
@@ -89,6 +90,7 @@ class HypLoadApp(App):
     value = NumericProperty()
     bg_color_for_video_res_btn = ListProperty()
     def __init__(self, **kwargs):
+        to_be_sure()
         self.value = 0
         self.text_color = 1,1,1,1
         self.text_input_bg = (0.95,0.95,0.95,1)
@@ -165,13 +167,12 @@ class HypLoadApp(App):
                 sm.transition = NoTransition()
                 sm.current = 'start_screen'
 
-    def hook_keyboard(self, window, key, *largs):
+    def hook_keyboard(self, window, key, *args):
         if key == 27:
             if hasattr(sm.children[0], "back_btn"):
                 sm.children[0].back_btn()
                 return True
             else :
-
                 return False
         return True
     def get_audio_only_image(self):
@@ -304,6 +305,7 @@ class Item_Of_List(GridLayout):
         self.title = title
         print(title)
         print(thumbnail)
+        print(views)
         print(views)
         with open("options.json") as options:
             options_read = options.read()
@@ -458,10 +460,14 @@ class MusicPlaylistDownloadScreen(Screen):
     def download(self):
         url = self.ids.input_of_youtube_playlist_link.text
         self.container = self.ids.container_playlist_download_screen_no_trad
-        self.loading = Label(text="Loading your playlist...")
+        with open('options.json', 'r', encoding="utf-8") as options:
+            options_read = options.read()
+            options_json = json.loads(options_read)
+        self.loading = Label()
+        self.loading.text = "Loading your playlist..."if options_json["language"] == "en" else "Chargement de votre playlist..."
         self.is_loading = True
         self.loading.id = "loading"
-        self.loading.font_size = app.text_size("medium big")
+        self.loading.font_size = app.text_size("small medium")
         self.loading.font_name = app.Roboto_font
         self.loading.color = app.text_color
         self.loading.pos_hint = {"center_y": 0.585}
@@ -634,53 +640,64 @@ class OptionsAndInfosScreen(Screen):
     def back_btn(self):
         sm.transition.direction ="right"
         sm.current="start_screen"
-
+@mainthread
+def launch_progress_update_actual_pb(value):
+    app.actual_pb.update_progress(None, value)
 class PlaylistScreen(Screen):
     def launch_yt_playlist(self):
         launching_thread = threading.Thread(target=self.download_yt_playlist)
         launching_thread.start()
-    @mainthread
-    def init_pb(self):
-        screen = sm.get_screen("music_playlist_download_screen")
-        print(screen.children[0])
-        print(screen.children[0].children[0])
-        print(screen.children[0].children[0].children)
-        screen.children[0].children[0].remove_widget(screen.children[0].children[0].children[1])
-        screen.children[0].children[0].remove_widget(screen.children[0].children[0].children[0])
-        self.actual_pb = my_progress_bar(screen.children[0].children[0])
-        self.actual_pb.update_progress(None, 100)
-        screen.children[0].children[0].add_widget(self.actual_pb)
     def download_yt_playlist(self):
         parent = sm.get_screen('playlist_screen').ids.playlist_loaded_no_trad
-        self.init_pb()
+        percent = 100/len(parent.children)
+        init_progress()
         self.back_btn()
-        return
-        with open("options.json", "r") as options:
-            options_read = options.read()
+        with open("options.json", "r") as file:
+            options_read = file.read()
             options_json = json.loads(options_read)
             resolution = options_json["video_res"]
-        if platform == "android":
-            for widget in parent.children :
-                print(widget.second_btn.img.source)
-                if "assets/checked_box" in widget.second_btn.img.source:
-                    if widget.type == "video":
-                        pass
-                    elif widget.type == "audio":
-                        good_one = widget.stream.streams.get_audio_only()
-                        name_of_file = "{0}.mp3".format(make_a_filename(good_one.title))
-                        good_one.download(filename=name_of_file)
-                        convert_file_location(name_of_file, widget.type)
-        elif platform == "win" or platform == "linux":
-            for widget in parent.children :
-                print(widget.second_btn.img.source)
-                if "assets/checked_box" in widget.second_btn.img.source:
-                    if widget.type == "video":
-                        pass
-                    elif widget.type == "audio":
-                        good_one = widget.stream.streams.get_audio_only()
-                        good_one.download(filename="{0}.mp3".format(make_a_filename(good_one.title)),output_path=f"musics_for_pc_users")
-                    else:
-                        print(widget.type)
+        print(sm.get_screen("music_playlist_download_screen").children)
+        print(sm.get_screen("music_playlist_download_screen").children[0].children)
+        widgets = sm.get_screen("playlist_screen").children[0].children[1].children[0].children
+        i=0
+        for widget in parent.children :
+            launch_progress_update_actual_pb(percent*i)
+            i+=1
+            print(widget.second_btn.img.source)
+            if "assets/checked_box" in widget.second_btn.img.source:
+                if len(widget.stream.title) > 18:
+                    loading_name = widget.stream.title[:22] + "..."
+                else:
+                    loading_name = widget.stream.title
+                sm.get_screen("music_playlist_download_screen").children[0].children[0].children[1].text = f"Télécharge : {loading_name}" if options_json['language'] == 'fr' else f"Downloading : {loading_name}"
+                try:
+                    download(widget.stream, widget.type, widget.title)
+                except HTTPError:
+                    for i in range(len(widgets)):
+                        if widgets[i].stream == widget.stream:
+                            list_of_redownload_links = []
+                            list_of_types = []
+                            for b in widgets[i:]:
+                                list_of_redownload_links.append(f"https://www.youtube.com/watch?v={b.stream.video_id}")
+                                list_of_types.append(b.type)
+                    print("erreur htttp sur ce téléchargement :",f"https://www.youtube.com/watch?v={widget.stream.video_id}")
+                    print(list_of_redownload_links)
+                    try:
+                        for iterator in range(len(list_of_redownload_links)):
+                            pytube_object = YouTube(list_of_redownload_links[iterator])
+                            print(pytube_object.title)
+                            download(pytube_object, list_of_types[iterator] ,make_a_filename(pytube_object.title))
+                        break
+                    except Exception as e:
+                        print("c'est la merde ", e)
+                        break
+                    # download(YouTube(f"https://www.youtube.com/watch?v={widget.stream.video_id}"),widget.type, widget.title)
+                except Exception as e:
+                    print(e)
+                    print(type(e))
+                    to_be_sure()
+                    app.wait = False
+
 
 
     def on_leave(self, *args):
@@ -691,6 +708,21 @@ class PlaylistScreen(Screen):
     def back_btn(self):
         sm.transition.direction ="right"
         sm.current="music_playlist_download_screen"
+
+@mainthread
+def init_progress():
+    screen = sm.get_screen("music_playlist_download_screen")
+    app.actual_pb = my_progress_bar(screen.children[0].children[0])
+    with open("options.json", "r") as options:
+        options_read = options.read()
+        options_json = json.loads(options_read)
+    screen.children[0].children[0].remove_widget(screen.children[0].children[0].children[1])
+    screen.children[0].children[0].remove_widget(screen.children[0].children[0].children[0])
+    screen.children[0].children[0].add_widget(app.actual_pb)
+    screen.children[0].children[0].children[0].height = app.p_to_dp(150)
+    screen.children[0].children[0].children[1].text = "Chargement des fichiers..." if options_json["language"] == "fr" else "Loading files..."
+    print("c'est chiant ça ", app.actual_pb)
+
 
 class ChooseResolutionScreen(Screen):
     def on_pre_start(self, *args):
@@ -787,7 +819,11 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                 elif options[1] == "1080p":
                     good_one = yt.streams.get_by_itag(137)
                     need_audio = True
-                file_name="videos_for_pc_users/{0}.mp4".format(make_a_filename(good_one.title)) if platform == "win" or platform == "linux" else "{0}.mp4".format(make_a_filename(good_one.title))
+                if platform == "win" or platform == "linux":
+                    file_name="videos_for_pc_users/{0}.mp4".format(make_a_filename(good_one.title))
+                else:
+                    file_name = "{0}.mp4".format(make_a_filename(good_one.title))
+                    print("le file name vient d'être set : ", file_name)
             if options[0]:
                 if platform == "android":
                     good_one.download(filename=file_name)
@@ -801,7 +837,6 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                         audio_for_merge = yt.streams.get_audio_only()
                         audio_for_merge.download(filename="audio.mp3")
                         ffmpeg_command = [
-<<<<<<< HEAD
                             'ffmpeg.exe',
                             '-i', "video.mp4",
                             '-i', "audio.mp3",
@@ -809,41 +844,23 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                             '-c:a', 'aac',
                             file_name
                         ]
-                        print(ffmpeg_command)
-                        print("dfsq")
-                        subprocess.run(ffmpeg_command)
-                        to_be_sure()
-                        print("dfsq")
+                        print("start downloadd")
+                        print(os.listdir(os.getcwd()))
                         if platform == "android":
+                            ffmpeg_for_android.Run(f"-i video.mp4 -i audio.mp3 -c:v copy -c:a aac {file_name}")
+                        else:
+                            subprocess.run(ffmpeg_command)
+                        print("downloadd finished")
+                        print(os.listdir(os.getcwd()))
+                        if platform == "android":
+                            while not file_name in os.listdir(os.getcwd()):
+                                pass
                             convert_file_location(file_name, "video")
-                            os.listdir(os.getcwd())
-                            os.listdir(os.getcwd() + "/videos_for_pc_users")
+                            print("après le convert_file_loc ", os.listdir(os.getcwd()))
                         app.wait = False
                     except Exception as e:
                         print(e)
                         to_be_sure()
-=======
-                            'ffmpeg',
-                            '-i', os.getcwd()+"/video.mp4",
-                            '-i', os.getcwd()+"/audio.mp3",
-                            '-c:v', 'copy',
-                            '-c:a', 'aac',
-                            '-strict', 'experimental',
-                            "videos_for_pc_users/video.mp4"
-                        ]
-                        print(ffmpeg_command)
-                        if platform == "win" or platform == "linux":
-                            print("test1")
-                            subprocess.run("ffmpeg -i video.mp4 video.mov")
-                            print("test2")
-                        elif platform == "android":
-                            ffmpeg.Run(ffmpeg_command)
-                            os.listdir(os.getcwd())
-                        app.wait = False
-                    except Exception as e:
-                        print(e)
-                        # to_be_sure()
->>>>>>> a8fec358b46f0b626b479ea43bb501bc040189ea
                         app.wait = False
                 else:
                     if platform == "android":
@@ -886,6 +903,7 @@ def init_yt_playlist(self, url, pa, base_container, pb, loading):
         playlist = Playlist(url)
         self.init_interface(pa, pb, loading)
         percent = 50/(len(playlist.videos)+1)
+        print(playlist.title)
         total = 50
         self.pb.update_progress(None, total)
         self.add_title(playlist.title)
@@ -895,7 +913,7 @@ def init_yt_playlist(self, url, pa, base_container, pb, loading):
             self.add_a_video(video)
             total += percent
             self.pb.update_progress(None, total)
-            time.sleep(.005)
+            time.sleep(.1)
         self.to_playlist_screen()
         self.cancel_or_finish(pa, base_container, pb, loading, "finish")
     except URLError:
@@ -906,23 +924,94 @@ def init_yt_playlist(self, url, pa, base_container, pb, loading):
         print("wtff", e)
         print("wtff", type(e))
         self.cancel_or_finish(pa, base_container, pb, loading, "error")
-
+def download(stream, type, title):
+    if type == "video":
+        need_audio = False
+        options = check_dl_preferencies_single()
+        if options[1] == "highest":
+            good_one = stream.streams.get_highest_resolution()
+        elif options[1] == "lowest":
+            good_one = stream.streams.get_lowest_resolution()
+        elif options[1] == "144p":
+            good_one = stream.streams.get_by_itag(160)
+            need_audio = True
+        elif options[1] == "240p":
+            good_one = stream.streams.get_by_itag(133)
+            need_audio = True
+        elif options[1] == "360p":
+            good_one = stream.streams.get_by_itag(18)
+            need_audio = True
+        elif options[1] == "480p":
+            need_audio = True
+            good_one = stream.streams.get_by_itag(135)
+        elif options[1] == "720p":
+            good_one = stream.streams.get_by_itag(22)
+        elif options[1] == "1080p":
+            good_one = stream.streams.get_by_itag(137)
+            need_audio = True
+        if platform == "win" or platform == "linux":
+            file_name = "videos_for_pc_users/{0}.mp4".format(make_a_filename(title))
+        else:
+            file_name = "{0}.mp4".format(make_a_filename(title))
+            print("le file name vient d'être set : ", file_name)
+        if need_audio:
+            app.wait = True
+            good_one.download(filename="video.mp4")
+            audio_for_merge = stream.streams.get_audio_only()
+            audio_for_merge.download(filename="audio.mp3")
+            ffmpeg_command = [
+                'ffmpeg.exe',
+                '-i', "video.mp4",
+                '-i', "audio.mp3",
+                '-c:v', 'copy',
+                '-c:a', 'aac',
+                file_name
+            ]
+            print("start downloadd")
+            print(os.listdir(os.getcwd()))
+            if platform == "android":
+                ffmpeg_for_android.Run(f"-i video.mp4 -i audio.mp3 -c:v copy -c:a aac {file_name}")
+            else:
+                subprocess.run(ffmpeg_command)
+            to_be_sure()
+            print("downloadd finished")
+            print(os.listdir(os.getcwd()))
+            if platform == "android":
+                while not file_name in os.listdir(os.getcwd()):
+                    pass
+                convert_file_location(file_name, "video")
+                print("après le convert_file_loc ", os.listdir(os.getcwd()))
+            app.wait = False
+        else:
+            if platform == "android":
+                good_one.download(filename=file_name)
+                convert_file_location(file_name, "video")
+            elif platform == "win" or platform == "linux":
+                good_one.download(filename=file_name)
+    elif type == "audio":
+        good_one = stream.streams.get_audio_only()
+        name_of_file = "{0}.mp3".format(make_a_filename(title))
+        output = os.getcwd() if platform == "android" else "musics_for_pc_users"
+        good_one.download(filename=name_of_file, output_path=output)
+        if platform == "android":
+            convert_file_location(name_of_file, type)
 def convert_file_location(file, type):
+    print("file name reçu dans convert_file_location ", file)
+    print("listdir avant le convert_file_location ", os.listdir(os.getcwd()))
     try:
         Environment = autoclass('android.os.Environment')
         if type == "audio":
             folder = Environment.DIRECTORY_MUSIC + "/HypLoad"
         elif type == "video":
             folder = Environment.DIRECTORY_MOVIES + "/HypLoad"
-        place_of_file = os.path.join(Environment.getExternalStorageDirectory().getAbsolutePath(), folder, "HypLoad")
+        place_of_file = os.path.join(Environment.getExternalStorageDirectory().getAbsolutePath(), folder)
         if not os.path.exists(place_of_file):
             os.mkdir(place_of_file)
         SS = SharedStorage()
-        print(place_of_file)
         SS.copy_to_shared(os.path.join(os.getcwd(), file), collection=folder)
-        print(os.listdir(folder))
-        os.remove(file)
         print(os.listdir(os.getcwd()))
+        os.remove(file)
+        to_be_sure()
     except Exception as e:
         print("oh !", e)
 
@@ -951,7 +1040,7 @@ def check_if_file_is_downloaded(title, type):
             os.mkdir(place_of_file)
         print(type)
         print(place_of_file)
-        print(os.listdir(place_of_file))
+        print("listdir getcwd", os.listdir(place_of_file))
         return source in os.listdir(place_of_file)
     elif platform == "win" or platform == "linux":
         print("le titre est ", title, " et le type est ", type)
@@ -966,7 +1055,7 @@ def check_if_file_is_downloaded(title, type):
 
 
 def make_a_filename(str):
-    return str.replace('\\', '').replace(":", "").replace('/', '').replace('<', '').replace('>', '').replace('*', '').replace('?', '').replace('"', '').replace('|', '')
+    return str.replace('\\', '').replace(":", "").replace('/', '').replace('<', '').replace('>', '').replace('*', '').replace('?', '').replace('"', '').replace('|', '').replace(' ', '_')
 def change_number_in_appropriate_form(num):
     number = str(num)
     division_factor = (len(number)-1)//3

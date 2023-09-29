@@ -13,16 +13,16 @@ package.domain = app.hamta
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas,json,ttf,lottie, aar, exe
+source.include_exts = py,png,jpg,kv,atlas,json,ttf,lottie, aar
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png, assets/*.json
 
 # (list) Source files to exclude (let empty to not exclude anything)
-source.exclude_exts = ffmpeg
+source.exclude_exts = ffmpeg.exe
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-#source.exclude_dirs = tests, bin, venv
+source.exclude_dirs = ffmpeg, pytube
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
@@ -37,11 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-<<<<<<< HEAD
-requirements = python3, kivy==2.1.0, git+https://github.com/Hypocrate-code/pytube.git, androidstorage4kivy, pytube3==9.6.4
-=======
-requirements = python3, kivy==2.1.0, git+https://github.com/Hypocrate-code/pytube.git, androidstorage4kivy, pytube3==9.6.4, jnius
->>>>>>> a8fec358b46f0b626b479ea43bb501bc040189ea
+requirements = python3, kivy==2.1.0, git+https://github.com/Hypocrate-code/pytube.git, androidstorage4kivy, pytube3==9.6.4, jnius, pyjnius
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
@@ -103,17 +99,13 @@ android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-android.api = 34
+android.api = 32
 
 # (int) Minimum API your APK / AAB will support.
-<<<<<<< HEAD
-#android.minapi = 25
-=======
-android.minapi = 24
->>>>>>> a8fec358b46f0b626b479ea43bb501bc040189ea
+android.minapi = 26
 
 # (int) Android SDK version to use
-#android.sdk = 34
+android.sdk = 30
 
 # (str) Android NDK version to use
 #android.ndk = 23b
@@ -125,7 +117,7 @@ android.minapi = 24
 #android.private_storage = True
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
-#android.ndk_path =
+android.ndk_path = /opt/android-sdk/ndk/r25c
 
 # (str) Android SDK directory (if empty, it will be automatically downloaded.)
 #android.sdk_path =
@@ -179,22 +171,14 @@ android.minapi = 24
 # their classes. Don't add jars that you do not need, since extra jars can slow
 # down the build process. Allows wildcards matching, for example:
 # OUYA-ODK/libs/*.jar
-<<<<<<< HEAD
 #android.add_jars = smart-exception-common-0.2.1.jar, smart-exception-java-0.2.1.jar
-=======
-android.add_jars = smart-exception-common-0.2.1.jar, smart-exception-java-0.2.1.jar
->>>>>>> a8fec358b46f0b626b479ea43bb501bc040189ea
 
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
 #android.add_src =
 
 # (list) Android AAR archives to add
-<<<<<<< HEAD
 #android.add_aars = ffmpeg-kit-python-v6.0.2.aar
-=======
-android.add_aars = ffmpeg-kit-release.aar
->>>>>>> a8fec358b46f0b626b479ea43bb501bc040189ea
 
 # (list) Put these files or directories in the apk assets directory.
 # Either form may be used, and assets need not be in 'source.include_exts'.
@@ -215,7 +199,7 @@ android.add_aars = ffmpeg-kit-release.aar
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-#android.gradle_dependencies = com.android.tools.build:gradle:7.0.0
+android.gradle_dependencies = com.arqies:ffmpeg-kit-python:6.0-2.LTS@aar, com.arthenica:smart-exception-common:0.2.1@jar , com.arthenica:smart-exception-java:0.2.1@jar
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.
@@ -230,7 +214,7 @@ android.enable_androidx = True
 # (list) Gradle repositories to add {can be necessary for some android.gradle_dependencies}
 # please enclose in double quotes 
 # e.g. android.gradle_repositories = "maven { url 'https://kotlin.bintray.com/ktor' }"
-#android.add_gradle_repositories =
+android.add_gradle_repositories = maven {url 'https://Arqies-Repositories.github.io/Gradle-FFmpeg-Kit-Python/'}
 
 # (list) packaging options to add 
 # see https://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.PackagingOptions.html
