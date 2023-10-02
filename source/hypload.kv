@@ -312,7 +312,7 @@ MainScreenManager:
                     font_size: app.p_to_dp(40)
                     padding: [app.p_to_dp(1),app.p_to_dp(19),app.p_to_dp(9.5),0]
                     on_text_validate:
-                        root.download()
+                        root.load()
                     canvas.after:
                         Color:
                             rgba: app.text_input_bg
@@ -325,7 +325,7 @@ MainScreenManager:
                     id: MPDS_validate_link_btn
                     text: 'Validate'
                     on_press:
-                        root.download()
+                        root.load()
                     color: (1,1,1,1)
                     font_size: app.text_size("small medium")
                     background_normal: ""

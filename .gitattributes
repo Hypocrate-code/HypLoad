@@ -1,0 +1,2 @@
+HypLoad.apk filter=lfs diff=lfs merge=lfs -text
+source/bin/*.apk filter=lfs diff=lfs merge=lfs -text
