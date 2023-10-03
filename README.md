@@ -19,7 +19,10 @@ You just have to download this file -> <a href="https://github.com/Hypocrate-cod
 * Choose between downloading the video or only its audio (perfect for musics or podcasts)
 * Dark theme / Light theme
 ### Available soon :
+<<<<<<< HEAD
 * Notifications keeping you updated of the downloading process
+=======
+>>>>>>> 7897390ebd8439b8a8ab4cfd899bf36bf29ccb5c
 * Your playlists link will be saved by the app for you to update them effortlessly (videos added downloaded)
 * Portability on any devices
 
@@ -42,7 +45,10 @@ Vous n'avez qu'à télécharger le fichier en cliquant ici -> <a href="https://g
 * Choisir entre télécharger la vidéo ou simplement son audio (parfait pour la musique podcasts)
 * Thème sombre / Thème clair  
 ### DISPONNIBLE BIENTÔT :
+<<<<<<< HEAD
 * Notifications vous gardant au courant de l'avancée de vos fichier
+=======
+>>>>>>> 7897390ebd8439b8a8ab4cfd899bf36bf29ccb5c
 * Les liens de vos playlists seront sauvegardés par l'application pour vous permettre de les mettre à jour simplement (télécharger les vidéos ayant été ajoutées)
 * Portabilité sur tous les appareils
 
