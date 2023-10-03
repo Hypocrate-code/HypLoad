@@ -21,9 +21,6 @@ from kivy.properties import ListProperty, NumericProperty
 from kivy.graphics import Color, RoundedRectangle
 from kivy.metrics import dp
 import webbrowser
-# import plyer
-
-# plyer.notification.notify(title="a", message="fds")
 ############# setup basic settings###############
 Config.set('kivy', 'show_touches', 0)
 import ssl
@@ -117,7 +114,72 @@ class HypLoadApp(App):
 
     def auto_width(self, element):
         return len(element.text) * (element.font_size / 1.8)
+    def test(self):
+        from kvdroid.jclass.android.graphics import Color
+        from kvdroid.tools.notification import (
+            create_notification,
+            get_notification_reply_text,
+            KVDROID_TAP_ACTION_NOTIFICATION,
+            KVDROID_ACTION_1_NOTIFICATION,
+            KVDROID_REPLY_ACTION_NOTIFICATION
+        )
+        from kvdroid.tools import get_resource
+        from kvdroid.tools.broadcast import BroadcastReceiver
+        from android.activuty import bind as activity_bind  # noqa
 
+        def perform_intent_action(intent):
+            if extras := intent.getExtras():
+                if value := extras.getString("tap"):
+                    # replace below code with whatever action you want to perform
+                    print("it is a tap")
+                    # incase you want to use the value too
+                    print(value)
+                elif value := extras.getString("action1"):
+                    # replace below code with whatever action you want to perform
+                    print("it is an action1")
+                    # incase you want to use the value too
+                    print(value)
+                elif value := extras.getString("reply"):
+                    # replace "TEST_KEY" with whatever 'key_reply_text' you used in creating
+                    # your notification
+                    reply = get_notification_reply_text(intent, "TEST_KEY")
+                    print(reply)
+                    # incase you want to use the value too
+                    print(value)
+
+        def get_notification_intent(intent):
+            perform_intent_action(intent)
+
+        def get_notification_broadcast(context, intent):
+            perform_intent_action(intent)
+
+        # This should be binded only once, else you get weird behaviors
+        # if you are creating different notifications for different purpose,
+        # you can bind different functions but only bind them once
+        activity_bind(on_new_intent=get_notification_intent)
+
+        br = BroadcastReceiver(
+            callback=get_notification_broadcast,
+            actions=[
+                KVDROID_TAP_ACTION_NOTIFICATION,
+                KVDROID_ACTION_1_NOTIFICATION,
+                KVDROID_REPLY_ACTION_NOTIFICATION
+            ],
+            use_intent_action=False
+        )
+        # start BroadcastReceiver before launching your notification.
+        create_notification(
+            small_icon=get_resource("mipmap").hypload_icon,
+            # replace `.icon` with the image filename you set as your app icon without the file extension (e.g without .png, .jpg ...)
+            channel_id="ch1",  # you must set this to any string value of your choice
+            title="You have a message",  # title of your notification
+            text="hi, just wanted to check on you",  # notification content text
+            ids=1,  # notification id, can be used to update certain notification
+            channel_name=f"message",
+            # provides a user-friendly label for the channel, helping users understand the purpose or category of notifications associated with that channel.
+            large_icon="assets/image.png",
+            small_icon_color=Color().rgb(0x00, 0xC8, 0x53),  # 0x00 0xC8 0x53 is same as 00C853
+        )
     def text_size(self, size):
         if size == "small":
             pass
