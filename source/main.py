@@ -31,11 +31,11 @@ print(platform)
 print(os.listdir(os.getcwd()))
 
 if platform == "android":
-    from jnius import autoclass
+    from jnius import autoclass, cast
     from jnius import *
-
     ffmpeg_for_android = autoclass('com.sahib.pyff.ffpy')
     from android.permissions import request_permissions, Permission
+    from android.runnable import run_on_ui_thread
     from androidstorage4kivy import SharedStorage
     # from kivy.metrics import Metrics
     from kivy.setupconfig import USE_SDL2
@@ -59,7 +59,7 @@ if platform == "android":
     elif width >= 4.5 and width < 5:
         scale_factor = 0.9
 elif platform == "win" or platform == "linux":
-    Window.fullscreen = 'auto'
+    Window.size = (Window.height * 2 / 3, Window.height)
     dpi = Window.dpi
     print("the screen's dpi is : ", dpi)
     width = (Window.system_size[0] * 2.54) / dpi
@@ -104,7 +104,6 @@ class HypLoadApp(App):
 
     def color(self, r, g, b, a):
         return (r / 255, g / 255, b / 255, a / 255)
-
     def p_to_dp(self, pixels):
         calc = round(pixels * (160 / 440) * scale_factor, 2)
         return str(calc) + "dp"
@@ -114,72 +113,6 @@ class HypLoadApp(App):
 
     def auto_width(self, element):
         return len(element.text) * (element.font_size / 1.8)
-    def test(self):
-        from kvdroid.jclass.android.graphics import Color
-        from kvdroid.tools.notification import (
-            create_notification,
-            get_notification_reply_text,
-            KVDROID_TAP_ACTION_NOTIFICATION,
-            KVDROID_ACTION_1_NOTIFICATION,
-            KVDROID_REPLY_ACTION_NOTIFICATION
-        )
-        from kvdroid.tools import get_resource
-        from kvdroid.tools.broadcast import BroadcastReceiver
-        from android.activuty import bind as activity_bind  # noqa
-
-        def perform_intent_action(intent):
-            if extras := intent.getExtras():
-                if value := extras.getString("tap"):
-                    # replace below code with whatever action you want to perform
-                    print("it is a tap")
-                    # incase you want to use the value too
-                    print(value)
-                elif value := extras.getString("action1"):
-                    # replace below code with whatever action you want to perform
-                    print("it is an action1")
-                    # incase you want to use the value too
-                    print(value)
-                elif value := extras.getString("reply"):
-                    # replace "TEST_KEY" with whatever 'key_reply_text' you used in creating
-                    # your notification
-                    reply = get_notification_reply_text(intent, "TEST_KEY")
-                    print(reply)
-                    # incase you want to use the value too
-                    print(value)
-
-        def get_notification_intent(intent):
-            perform_intent_action(intent)
-
-        def get_notification_broadcast(context, intent):
-            perform_intent_action(intent)
-
-        # This should be binded only once, else you get weird behaviors
-        # if you are creating different notifications for different purpose,
-        # you can bind different functions but only bind them once
-        activity_bind(on_new_intent=get_notification_intent)
-
-        br = BroadcastReceiver(
-            callback=get_notification_broadcast,
-            actions=[
-                KVDROID_TAP_ACTION_NOTIFICATION,
-                KVDROID_ACTION_1_NOTIFICATION,
-                KVDROID_REPLY_ACTION_NOTIFICATION
-            ],
-            use_intent_action=False
-        )
-        # start BroadcastReceiver before launching your notification.
-        create_notification(
-            small_icon=get_resource("mipmap").hypload_icon,
-            # replace `.icon` with the image filename you set as your app icon without the file extension (e.g without .png, .jpg ...)
-            channel_id="ch1",  # you must set this to any string value of your choice
-            title="You have a message",  # title of your notification
-            text="hi, just wanted to check on you",  # notification content text
-            ids=1,  # notification id, can be used to update certain notification
-            channel_name=f"message",
-            # provides a user-friendly label for the channel, helping users understand the purpose or category of notifications associated with that channel.
-            large_icon="assets/image.png",
-            small_icon_color=Color().rgb(0x00, 0xC8, 0x53),  # 0x00 0xC8 0x53 is same as 00C853
-        )
     def text_size(self, size):
         if size == "small":
             pass
@@ -224,6 +157,7 @@ class HypLoadApp(App):
         sm.add_widget(ChooseResolutionScreen(name="choose_resolution_screen"))
         sm.add_widget(PlaylistScreen(name="playlist_screen"))
         sm.add_widget(CustomResolutionScreen(name="custom_resolution_screen"))
+        sm.add_widget(SavedLinksScreen(name="saved_links_screen"))
         self.icon = "assets/hypload_icon.png"
         self.wait = False
         return sm
@@ -562,9 +496,15 @@ class MusicPlaylistDownloadScreen(Screen):
         if getattr(self, "is_loading", None):
             parent = sm.get_screen("music_playlist_download_screen").children[0]
             parent.remove_widget(self.loading)
+            print("koa")
             parent.remove_widget(self.pb)
             parent.add_widget(self.container)
         else:
+            with open('options.json', 'r', encoding="utf-8") as options:
+                options_read = options.read()
+                options_json = json.loads(options_read)
+            self.ids.container_playlist_download_screen_no_trad.children[2].text = "Entrez le lien de votre playlist YouTube" if options_json[
+                                                                                           "language"] == "fr" else "Enter the link of your YouTube playlist"
             sm.get_screen("music_playlist_download_screen").children[0].children[0].children[1].children[1].text = ""
 
     def load(self):
@@ -596,17 +536,43 @@ class MusicPlaylistDownloadScreen(Screen):
         pa.add_widget(loading)
 
     @mainthread
-    def cancel_or_finish(self, pa, container, pb, loading, type):
+    def cancel_or_finish(self, pa, container, pb, loading, type, title):
         self.is_loading = False
+        print(pa.children)
         pa.remove_widget(pb)
         pa.remove_widget(loading)
+        print(pa.children)
         with open('options.json', 'r', encoding="utf-8") as options:
             options_read = options.read()
             options_json = json.loads(options_read)
             if type == "error":
-                container.children[2].text = "Une erreur est survenue, votre lien est invalide." if options_json[
-                                                                                                        "language"] == "fr" else "An error occured, your link is invalid."
+                container.children[2].text = "Une erreur est survenue, votre lien est invalide." if options_json["language"] == "fr" else "An error occured, your link is invalid."
+                with open('links.json', 'r+') as links:
+                    links_read = json.load(links)
+                for i, el in enumerate(links_read['links']):
+                    print(i, el)
+                    if el[1] == container.children[1].children[1].text:
+                        links_read['links'].pop(i)
+                        text = "Playlist deleted" if options_json['language'] == "en" else "Playlist supprimée"
+                        send_toast_notification(text)
             elif type == "finish":
+                with open('links.json', 'r+') as links:
+                    links_read = json.load(links)
+                    is_in = False
+                    for element in links_read["links"]:
+                        if container.children[1].children[1].text == element[1]:
+                            is_in = True
+                    if not is_in:
+                        links_read["links"].append((title, container.children[1].children[1].text))
+                        if platform == "android":
+                            try:
+                                text = "Playlist sauvegardée !" if options_json["language"] == "fr" else "Playlist saved !"
+                                send_toast_notification(text)
+                            except Exception as e:
+                                print("marche passss")
+                    links.seek(0)
+                    links.truncate()
+                    json.dump(links_read, links, indent=4)
                 container.children[2].text = "Entrez le lien de votre playlist YouTube" if options_json[
                                                                                                "language"] == "fr" else "Enter the link of your YouTube playlist"
             elif type == "internet_error":
@@ -656,7 +622,35 @@ class MusicPlaylistDownloadScreen(Screen):
         sm.transition.direction = "right"
         sm.current = "start_screen"
 
-
+class SavedLinksScreen(Screen):
+    def on_pre_enter(self, *args):
+        container = self.ids.SLS_container_no_trad
+        with open("links.json") as links_file:
+            links_read = links_file.read()
+            links_dict = json.loads(links_read)
+        if len(links_dict["links"]) == 0:
+            with open("options.json") as options_file:
+                options_read = options_file.read()
+                options = json.loads(options_read)
+            self.img = Image(size_hint = (None, None),size=(app.p_to_dp(850), app.p_to_dp(850)), pos_hint={'center_x': 0.5, 'center_y':0.5})
+            self.img.source = f"assets/gideon_the_pigeon_{options['color_mode']}_{options['language']}.png"
+            print(Window.width)
+            self.children[0].add_widget(self.img)
+        else:
+            for link in links_dict["links"]:
+                try:
+                    container.add_widget(A_Playlist_Item(link[0], link[1]))
+                except Exception as e:
+                    print(e)
+    def back_btn(self):
+        sm.transition.direction = "right"
+        sm.current = "start_screen"
+    def on_leave(self, *args):
+        container = self.ids.SLS_container_no_trad
+        if getattr(self, "img", None):
+            self.children[0].remove_widget(self.img)
+        while len(container.children) > 0:
+            container.remove_widget(container.children[0])
 class MainScreenManager(ScreenManager):
     pass
 
@@ -718,7 +712,73 @@ class my_progress_bar(Widget):
         self.progress_rect.size = (((self.par.size[0] - app.translate_dp_to_p(app.p_to_dp(15))) / 100) * value,
                                    app.translate_dp_to_p(app.p_to_dp(20)))
 
+class A_loading_button(Button):
+    def __init__(self, **kwargs):
+        super(A_loading_button, self).__init__(**kwargs)
+        with open("options.json") as options:
+            options_read = options.read()
+            options_json = json.loads(options_read)
+        self.text = "Charger" if options_json["language"] == "fr" else "Load"
+        self.font_size = app.text_size("small medium")
+        self.font_name = app.Roboto_bold_font
 
+        with self.canvas.before:
+            Color(1,0,0,1)
+            self.rect = RoundedRectangle(pos=self.pos,
+                                         size=self.size,
+                                         radius=[app.translate_dp_to_p(app.p_to_dp(12))])
+        self.background_active = ""
+        self.background_normal = ""
+        self.background_down = ""
+        self.background_color = 0, 0, 0, 0
+        self.size_hint = (1, None)
+        self.height = app.p_to_dp(80)
+    def on_size(self, *args):
+        self.rect.size = self.size
+    def on_pos(self, *args):
+        self.rect.pos = self.pos
+class A_Playlist_Item(GridLayout):
+    def __init__(self, title, link, **kwargs):
+        self.link = link
+        super(A_Playlist_Item, self).__init__(**kwargs)
+        with self.canvas:
+            Color(*app.light_grey)
+            self.rect = RoundedRectangle(pos=(self.pos[0],self.pos[1] - app.translate_dp_to_p(app.p_to_dp(2))),
+                                         size=self.size,
+                                         radius=[app.translate_dp_to_p(app.p_to_dp(16))])
+        self.btn = A_loading_button()
+        self.btn.bind(on_press=lambda x: set_a_playlist_link(self.link))
+        self.cols = 2
+        self.size_hint = (1, None)
+        self.height = app.p_to_dp(120)
+        self.padding = [app.p_to_dp(32),0,0,0]
+        self.spacing = [app.p_to_dp(22)]
+        self.title_of_playlist = Label(text = title)
+        self.title_of_playlist.color = app.text_color
+        self.title_of_playlist.font_name = app.Roboto_font
+        self.title_of_playlist.font_size = app.text_size("small medium")
+        self.title_of_playlist.halign = "left"
+        self.title_of_playlist.valign = "center"
+        self.title_of_playlist.size_hint = (None, None)
+        self.title_of_playlist.width = app.p_to_dp(575)
+        self.title_of_playlist.height = self.height
+        self.title_of_playlist.text_size = self.title_of_playlist.size
+        self.title_of_playlist.shorten = True
+        self.title_of_playlist.split_str = "..."
+        self.title_of_playlist.shorten_from = "right"
+
+        self.my_layout = AnchorLayout(size_hint=(None, 1), width=app.p_to_dp(200), padding=[0,app.p_to_dp(7),0,0])
+        self.add_widget(self.title_of_playlist)
+        self.my_layout.add_widget(self.btn)
+        self.add_widget(self.my_layout)
+    def on_size(self, *args):
+        self.rect.size = self.size
+    def on_pos(self, *args):
+        self.rect.pos = (self.pos[0],self.pos[1] - app.translate_dp_to_p(app.p_to_dp(2)))
+
+def set_a_playlist_link(lien):
+    sm.current = "music_playlist_download_screen"
+    sm.get_screen("music_playlist_download_screen").ids.input_of_youtube_playlist_link.text = lien
 class OptionsAndInfosScreen(Screen):
     def on_pre_start(self, *args):
         sm.transition.direction = "left"
@@ -737,12 +797,10 @@ class OptionsAndInfosScreen(Screen):
     def get_and_set_color_of_the_app(self):
         with open("options.json") as options:
             options_read = options.read()
-            print("wtf", options_read)
             options_json = json.loads(options_read)
             clr_mod = options_json["color_mode"]
             if clr_mod == "dark":
                 # EVERYTHING RELATED TO DARK MODE
-
                 app.text_input_bg = app.color(66, 66, 66, 255)
                 app.background_of_the_app = app.color(33, 33, 33, 255)
                 app.text_color = app.color(255, 255, 255, 225)
@@ -750,14 +808,14 @@ class OptionsAndInfosScreen(Screen):
                 app.bg_color_for_video_res_btn = app.color(255, 44, 56, 190)
             else:
                 # EVERYTHING RELATED TO LIGHT MODE
-
                 app.text_input_bg = (0.95, 0.95, 0.95, 1)
                 app.background_of_the_app = app.color(250, 250, 250, 255)
                 app.text_color = app.color(72, 75, 106, 255)
                 app.light_grey = app.color(242, 240, 240, 255)
                 app.bg_color_for_video_res_btn = app.color(171, 135, 255, 35)
-
             Window.clearcolor = tuple(app.background_of_the_app)
+            sm.get_screen("language_screen").ids.hello_img_no_trad.source = f"assets/hello_{clr_mod}.png"
+            sm.get_screen("language_screen").ids.bonjour_img_no_trad.source = f"assets/bonjour_{clr_mod}.png"
             return True
 
     def change_color_mode(self):
@@ -794,8 +852,6 @@ class PlaylistScreen(Screen):
 
     def download_yt_playlist(self):
         music_playlist_dl_screen = sm.get_screen("music_playlist_download_screen")
-        init_progress(music_playlist_dl_screen)
-        self.back_btn(music_playlist_dl_screen)
         with open("options.json", "r") as file:
             options_read = file.read()
             options_json = json.loads(options_read)
@@ -805,43 +861,56 @@ class PlaylistScreen(Screen):
             list_of_types = []
             ## init of videos to download
             num_of_element_to_dl = 0
+            is_empty = True
             for element in widgets:
                 if "assets/checked_box" in element.second_btn.img.source:
                     num_of_element_to_dl += 1
                     list_of_download_links.append(f"https://www.youtube.com/watch?v={element.stream.video_id}")
                     list_of_types.append(element.type)
+                    is_empty = False
                 else:
                     list_of_download_links.append(None)
                     list_of_types.append(None)
-            percent = 100 / num_of_element_to_dl
-            total = 0
+            if is_empty:
+                music_playlist_dl_screen.is_loading = False
+                self.back_btn()
+            else:
+                self.back_btn(music_playlist_dl_screen)
+                init_progress(music_playlist_dl_screen)
+                percent = 100 / num_of_element_to_dl
+                total = 0
             ## launch of downloads
-            for iterator in range(len(widgets)):
-                loading_name = widgets[iterator].stream.title[:27] + "..." if len(widgets[iterator].stream.title) > 27 else widgets[iterator].stream.title
-                print(loading_name)
-                music_playlist_dl_screen.loading.text = f"Télécharge : {loading_name}" if options_json['language'] == 'fr' else f"Downloading : {loading_name}"
-                if not list_of_types[iterator]:
-                    continue
-                total+=percent
-                launch_progress_update_actual_pb(total)
-                pytube_object = YouTube(list_of_download_links[iterator])
-                download(pytube_object, list_of_types[iterator], make_a_filename(pytube_object.title))
-            #downloads finished
-            launch_progress_update_actual_pb(100)
-            music_playlist_dl_screen.cancel_or_finish(music_playlist_dl_screen.children[0], music_playlist_dl_screen.container, app.actual_pb,music_playlist_dl_screen.loading,"finish")
-            music_playlist_dl_screen.is_loading = False
+                for iterator in range(len(widgets)):
+                    loading_name = widgets[iterator].stream.title[:27] + "..." if len(widgets[iterator].stream.title) > 27 else widgets[iterator].stream.title
+                    print(loading_name)
+                    music_playlist_dl_screen.loading.text = f"Télécharge : {loading_name}" if options_json['language'] == 'fr' else f"Downloading : {loading_name}"
+                    if not list_of_types[iterator]:
+                        continue
+                    if platform == "android":
+                        send_notification(loading_name)
+                    total+=percent
+                    launch_progress_update_actual_pb(total)
+                    pytube_object = YouTube(list_of_download_links[iterator])
+                    download(pytube_object, list_of_types[iterator], make_a_filename(pytube_object.title))
+            # #downloads finished
+            #     while not getattr(app, "actual_pb", None):
+            #         pass
+                launch_progress_update_actual_pb(100)
+                music_playlist_dl_screen.cancel_or_finish(music_playlist_dl_screen.children[0], music_playlist_dl_screen.container, app.actual_pb,music_playlist_dl_screen.loading,"finish", None)
+                music_playlist_dl_screen.is_loading = False
         except HTTPError:
-            music_playlist_dl_screen.cancel_or_finish(music_playlist_dl_screen.children[0], music_playlist_dl_screen.container, app.actual_pb,music_playlist_dl_screen.loading,"error")
+            music_playlist_dl_screen.cancel_or_finish(music_playlist_dl_screen.children[0], music_playlist_dl_screen.container, app.actual_pb,music_playlist_dl_screen.loading,"error", None)
             to_be_sure()
             print("ufck off, http error")
             print(list_of_download_links)
         except URLError:
+            print("fdsfds")
             while not (getattr(app, "actual_pb", None) and music_playlist_dl_screen.loading in music_playlist_dl_screen.children[0].children):
                 pass
-            music_playlist_dl_screen.cancel_or_finish(music_playlist_dl_screen.children[0], music_playlist_dl_screen.container, app.actual_pb,music_playlist_dl_screen.loading,"internet_error")
+            music_playlist_dl_screen.cancel_or_finish(music_playlist_dl_screen.children[0], music_playlist_dl_screen.container, app.actual_pb,music_playlist_dl_screen.loading,"internet_error"), None
             to_be_sure()
         except Exception as e:
-            music_playlist_dl_screen.cancel_or_finish(music_playlist_dl_screen.children[0], music_playlist_dl_screen.container, app.actual_pb,music_playlist_dl_screen.loading,"error")
+            music_playlist_dl_screen.cancel_or_finish(music_playlist_dl_screen.children[0], music_playlist_dl_screen.container, app.actual_pb,music_playlist_dl_screen.loading,"error", None)
             print("c'est la merde ", e)
             print(type(e))
             to_be_sure()
@@ -930,8 +999,10 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
             with open("options.json") as file:
                 options_read = file.read()
                 options_json = json.loads(options_read)
-                self.ids.MSDS_label.text = f"Télécharge : {yt.title[:18]}..." if options_json[
-                                                                                     'language'] == 'fr' else f"Downloading : {yt.title[:18]}..."
+                loading_name = yt.title[:27] + "..." if len(yt.title) > 27 else yt.title
+                self.ids.MSDS_label.text = f"{'Télécharge' if options_json['language'] == 'fr' else 'Downloading'} : {loading_name}"
+                if platform == "android":
+                    send_notification(loading_name)
             yt.register_on_progress_callback(self.on_progress)
             yt.register_on_complete_callback(self.on_complete)
             if options[0]:
@@ -971,6 +1042,7 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
             if options[0]:
                 if platform == "android":
                     good_one.download(filename=file_name)
+                    convert_file_location(file_name, "audio")
                 elif platform == "win" or platform == "linux":
                     good_one.download(filename=file_name, output_path="musics_for_pc_users")
             else:
@@ -1067,15 +1139,15 @@ def init_yt_playlist(self, url, pa, base_container, pb, loading):
             self.pb.update_progress(None, total)
             time.sleep(.1)
         self.to_playlist_screen()
-        self.cancel_or_finish(pa, base_container, pb, loading, "finish")
+        self.cancel_or_finish(pa, base_container, pb, loading, "finish", playlist.title)
     except URLError:
-        self.cancel_or_finish(pa, base_container, pb, loading, "internet_error")
+        self.cancel_or_finish(pa, base_container, pb, loading, "internet_error", None)
     except KeyError:
-        self.cancel_or_finish(pa, base_container, pb, loading, "error")
+        self.cancel_or_finish(pa, base_container, pb, loading, "error", None)
     except Exception as e:
         print("wtff", e)
         print("wtff", type(e))
-        self.cancel_or_finish(pa, base_container, pb, loading, "error")
+        self.cancel_or_finish(pa, base_container, pb, loading, "error", None)
 
 
 def download(stream, type, title):
@@ -1201,9 +1273,10 @@ def check_if_file_is_downloaded(title, type):
         place_of_file = os.path.join(Environment.getExternalStorageDirectory().getAbsolutePath(), folder, "HypLoad")
         if not os.path.exists(place_of_file):
             os.mkdir(place_of_file)
-        print(type)
         print(place_of_file)
-        print("listdir getcwd", os.listdir(place_of_file))
+        print("listdir hypload", os.listdir(place_of_file))
+        print("listdir à la base", os.listdir(os.path.join(Environment.getExternalStorageDirectory().getAbsolutePath(), folder)))
+        print(source in os.listdir(place_of_file))
         return source in os.listdir(place_of_file)
     elif platform == "win" or platform == "linux":
         print("le titre est ", title, " et le type est ", type)
@@ -1222,8 +1295,23 @@ def make_a_filename(str):
     return str.replace('\\', '').replace(":", "").replace('/', '').replace('<', '').replace('>', '').replace('*',
                                                                                                              '').replace(
         '?', '').replace('"', '').replace('|', '').replace(' ', '_')
-
-
+@mainthread
+def send_notification(content):
+    print("notification pas envoyée car kvdroid est à chier")
+def send_toast_notification(content):
+    Build = autoclass("android.os.Build")
+    AndroidString = autoclass('java.lang.String')
+    Toast = autoclass('android.widget.Toast')
+    activity = autoclass("org.kivy.android.PythonActivity").mActivity
+    toast(content, Toast, activity, AndroidString)
+if platform == "android":
+    @run_on_ui_thread
+    def toast(content, Toast, activity, AndroidString):
+        Toast.makeText(
+            activity,
+            cast('java.lang.CharSequence', AndroidString(content)),
+            Toast.LENGTH_LONG
+        ).show()
 def change_number_in_appropriate_form(num):
     number = str(num)
     division_factor = (len(number) - 1) // 3

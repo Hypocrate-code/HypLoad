@@ -4,7 +4,7 @@
 title = HypLoad
 
 # (str) Package name
-package.name = Hypload
+package.name = hypload
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = app.hamta
@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy==2.1.0, git+https://github.com/Hypocrate-code/pytube.git, androidstorage4kivy, pytube3==9.6.4, jnius, pyjnius, https://github.com/kvdroid/Kvdroid/archive/refs/heads/master.zip
+requirements = python3, kivy==2.1.0, git+https://github.com/Hypocrate-code/pytube.git, androidstorage4kivy, pytube3==9.6.4, jnius, pyjnius, https://github.com/kvdroid/Kvdroid/archive/refs/heads/master.zip, android
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
@@ -190,16 +190,16 @@ android.ndk_path = /opt/android-sdk/ndk/r25c
 # The option may be used in three ways, the value may contain one or zero ':'
 # Some examples:
 # 1) A file to add to resources, legal resource names contain ['a-z','0-9','_']
-# android.add_resources = my_icons/all-inclusive.png:drawable/all_inclusive.png
+android.add_resources = res/drawable-hdpi:drawable-hdpi, res/drawable-mdpi:drawable-mdpi, res/drawable-xhdpi:drawable-xhdpi, res/drawable-xxhdpi:drawable-xxhdpi, res/drawable-xxxhdpi:drawable-xxxhdpi
 # 2) A directory, here  'legal_icons' must contain resources of one kind
-# android.add_resources = legal_icons:drawable
+#android.add_resources = legal_icons:drawable
 # 3) A directory, here 'legal_resources' must contain one or more directories, 
 # each of a resource kind:  drawable, xml, etc...
-# android.add_resources = legal_resources
+#android.add_resources = res
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-android.gradle_dependencies = com.arqies:ffmpeg-kit-python:6.0-2.LTS@aar, com.arthenica:smart-exception-common:0.2.1@jar , com.arthenica:smart-exception-java:0.2.1@jar
+android.gradle_dependencies = androidx.core:core:1.6.0  , com.arqies:ffmpeg-kit-python:6.0-2.LTS@aar, com.arthenica:smart-exception-common:0.2.1@jar , com.arthenica:smart-exception-java:0.2.1@jar
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.

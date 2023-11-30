@@ -7,6 +7,7 @@ MainScreenManager:
     ChooseResolutionScreen:
     PlaylistScreen:
     CustomResolutionScreen:
+    SavedLinksScreen:
         
         
 <BackButton@AnchorLayout>:
@@ -125,28 +126,73 @@ MainScreenManager:
 
 
 <LanguageScreen>:
-    AnchorLayout:
+    FloatLayout:
         size: root.width, root.height
-        anchor_x: 'center'
-        anchor_y: 'center'
-        GridLayout:
-            cols: 1
-            rows: 2
+        spacing: app.translate_dp_to_p(app.p_to_dp(30))
+        RelativeLayout:
+            pos: (root.width/2 - self.width/2, root.height/2 + self.parent.spacing)
+            width: app.p_to_dp(420)
+            height: app.p_to_dp(500)
             size_hint: (None, None)
-            spacing: app.p_to_dp(12)
-            size: (app.p_to_dp(300), app.p_to_dp(450))
-            BasicButton:
-                text: 'Français'
-                on_press:
-                    root.setLanguage('fr')
-                    
-                size_hint_y: 0.5
-            BasicButton:
-                text: 'English'
+            Button:
+                background_normal: ""
+                background_color: (0 ,0 ,0 , 0)
+                canvas.before:
+                    Color:
+                        rgba: app.light_grey
+                    RoundedRectangle:
+                        size: self.size
+                        pos: self.pos
+                        radius: [app.translate_dp_to_p(app.p_to_dp(80))]
                 on_press:
                     root.setLanguage('en')
-                    
-                size_hint_y: 0.5
+            Image:
+                id: hello_img_no_trad
+                pos: (self.parent.width/2 - self.width/2, self.parent.height/2 - (self.height/12)*4.2)
+                size_hint: (None, None)
+                height: app.p_to_dp(300)
+                width: app.p_to_dp(360)
+                source: "assets/hello_dark.png"
+            Label:
+                pos: (self.parent.width/2 - self.width/2,0)
+                size_hint_y: None
+                height: app.p_to_dp(170)
+                font_size: app.p_to_dp(60)
+                color: app.text_color
+                font_name: app.Roboto_bold_font
+                text: 'English'
+        RelativeLayout:
+            pos: (root.width/2 - self.width/2, root.height/2 - self.height - self.parent.spacing)
+            width: app.p_to_dp(420)
+            height: app.p_to_dp(500)
+            size_hint: (None, None)
+            Button:
+                background_normal: ""
+                background_color: (0 ,0 ,0 , 0)
+                canvas.before:
+                    Color:
+                        rgba: app.light_grey
+                    RoundedRectangle:
+                        size: self.size
+                        pos: self.pos
+                        radius: [app.translate_dp_to_p(app.p_to_dp(80))]
+                on_press:
+                    root.setLanguage('fr')
+            Image:
+                id: bonjour_img_no_trad
+                pos: (self.parent.width/2 - self.width/2, self.parent.height/2 - (self.height/12)*4.2)
+                size_hint: (None, None)
+                height: app.p_to_dp(300)
+                width: app.p_to_dp(360)
+                source: "assets/bonjour_dark.png"
+            Label:
+                pos: (self.parent.width/2 - self.width/2,0)
+                size_hint_y: None
+                height: app.p_to_dp(170)
+                font_size: app.p_to_dp(60)
+                color: app.text_color
+                font_name: app.Roboto_bold_font
+                text: 'Français'
 
 <StartScreen>:
     BoxLayout:
@@ -197,7 +243,7 @@ MainScreenManager:
                     id: SS_my_playlists_btn
                     text: "My playlists saved"
                     on_press:
-                        app.test()
+                        root.manager.current = "saved_links_screen"
                 BasicButton:
                     id: SS_others_btn
                     text: "Options and infos"
@@ -387,15 +433,10 @@ MainScreenManager:
                 Image:
                     source: "assets/left-arrow.png"
                     background_color: (0.5,0.5,0.5,1)
-
-
-
         ScrollView:
             pos_hint:{"center_x":0.5, "y": PS_btn_validate_download.height/root.height + 0.04}
             id: playlist_loaded_scroll_view_no_trad
             size:(app.translate_dp_to_p(app.p_to_dp(850)),root.height - title_container_no_trad.height - (PS_btn_validate_download.height + 0.04 * root.height))
-            background_color: 0,1,0,1
-
             size_hint: (None,None)
             do_scroll_y: True
             do_scroll_x: False
@@ -427,6 +468,65 @@ MainScreenManager:
                     radius: [app.translate_dp_to_p(app.p_to_dp(25))]
                     pos: self.pos
                     size: self.size
+
+<SavedLinksScreen>:
+    FloatLayout:
+        size: root.width, root.height
+        ScrollView:
+            pos_hint:{"center_x":0.5, "y": 0}
+            size:(app.translate_dp_to_p(app.p_to_dp(850)),root.height)
+            size_hint: (None,None)
+            do_scroll_y: True
+            do_scroll_x: False
+            GridLayout:
+                padding: [0, root.ids.SLS_grid_no_trad.height + app.translate_dp_to_p(app.p_to_dp(50)),0, app.p_to_dp(50)]
+                cols: 1
+                id: SLS_container_no_trad
+                orientation:"tb-lr"
+                spacing: app.p_to_dp(30)
+                height: len(self.children) * (app.translate_dp_to_p(app.p_to_dp(150)) + self.spacing[0]) - self.spacing[0] + self.padding[1] + self.padding[3]
+                size_hint_y: None
+        GridLayout:
+            pos_hint: {"center_x":0.5, "y": 1 - (SLS_grid_no_trad.height / root.height)}
+            id: SLS_grid_no_trad
+            spacing: [app.p_to_dp(20)]
+            orientation: "lr-tb"
+            cols: 2
+            rows: 1
+            padding: [0, app.p_to_dp(70), app.p_to_dp(20),app.p_to_dp(30)]
+            size_hint: (None, None)
+            height: app.p_to_dp(180)
+            width: app.translate_dp_to_p(app.p_to_dp(850))
+            AnchorLayout:
+                size_hint: (None, None)
+                size: (app.p_to_dp(120),app.p_to_dp(120))
+                pos_hint: {'x': 0.04, 'top': 0.96}
+                BasicButton:
+                    id: anchor_back_btn_no_trad
+                    canvas.before:
+                        Color:
+                            rgba: app.background_of_the_app
+                        RoundedRectangle:
+                            size : self.size
+                            pos: self.pos
+                            radius: [dp(app.p_to_dp(16).split("dp")[0])]
+                    on_press:
+                        root.back_btn()
+                Image:
+                    source: "assets/left-arrow.png"
+                    background_color: (0.5,0.5,0.5,1)
+            Label:
+                text: "To keep your playlists updated :"
+                id: SLS_label
+                halign: "left"
+                valign: "center"
+                text_size: self.size
+                font_name: app.Roboto_bold_font
+                color: app.text_color
+                font_size: app.p_to_dp(45)
+                width: app.p_to_dp(700)
+                padding: [app.p_to_dp(18),app.p_to_dp(10)]
+
 
 
 

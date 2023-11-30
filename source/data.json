@@ -22,7 +22,8 @@
     "CRS_custom":"Résolution personnalisée",
     "CRS_label": "Choisissez la résolution\navec laquelle vous souhaitez\ntélécharger vos vidéos",
     "PS_btn_validate_download": "Lancer les téléchargements",
-    "CHRS_label": " La vidéo ne sera pas téléchargée si\nla résolution n'est pas disponible.\nLes téléchargements seront\naussi bien plus longs."
+    "CHRS_label": " La vidéo ne sera pas téléchargée si\nla résolution n'est pas disponible.\nLes téléchargements seront\naussi bien plus longs.",
+    "SLS_label": "Pour mettre à jour vos playlists :"
   },
   "en": {
    "SS_label": "Welcome to [color=#FF0000][font=Roboto-Bold]HypLoad[/font][/color],\nyour personnal Youtube\nvideo downloader.",
@@ -47,6 +48,7 @@
     "CRS_custom":"Custom resolution",
     "CRS_label": "Choose the resolution\nyou want your videos\nto be downloaded in",
     "PS_btn_validate_download": "Start downloading",
-    "CHRS_label": "The video won't be downloaded if\nthe resolution asked isn't available.\nDownloadings will also be much longer"
+    "CHRS_label": "The video won't be downloaded if\nthe resolution asked isn't available.\nDownloadings will also be much longer",
+    "SLS_label": "To keep your playlists updated :"
   }
 }

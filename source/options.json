@@ -1,6 +1,5 @@
 {
     "color_mode": "dark",
     "only_audio": false,
-    "video_res": "1080p",
-    "language": "en"
+    "video_res": "lowest"
 }
