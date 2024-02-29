@@ -47,7 +47,7 @@ Sous Android, vous n'avez qu'à télécharger le fichier en cliquant ici -> <a h
 * Choisir la résolution des vidéos que vous téléchargez 
 * Choisir entre télécharger la vidéo ou simplement son audio (parfait pour la musique podcasts)
 * Thème sombre / Thème clair
-### DISPONNIBLE BIENTÔT :
+### DISPONIBLE BIENTÔT :
 * Portabilité sur iOS (si demandé)
 
 ### Petit Aperçu :  
