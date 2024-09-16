@@ -12,7 +12,7 @@ The app is only available on **Android** mobile for now.
 
 
 ### Download HypLoad : 
-On Android, you just have to download this file -> <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.1.0.0/HypLoad.apk" target="blank">**HypLoad.apk**</a>, and execute it to install the app, then you're free to play with it !
+On Android, you just have to download this file -> <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.2.0.0/HypLoad.apk" target="blank">**HypLoad.apk**</a>, and execute it to install the app, then you're free to play with it !
 
 ### Features :
 * English and French traduction
@@ -37,7 +37,7 @@ N'attendez pas et essayez là ! Cette app est entièrement gratuite, sans pubs e
 L'application n'est actuellement disponible que sur les téléphones fonctionnant sous **Android**.
 
 ### Téléchargement :
-Sous Android, vous n'avez qu'à télécharger le fichier en cliquant ici -> <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.1.0.0/HypLoad.apk" target="blank">**HypLoad.apk**</a> et l'exécuter pour installer l'application, après cela vous êtes libres de l'utiliser !
+Sous Android, vous n'avez qu'à télécharger le fichier en cliquant ici -> <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.2.0.0/HypLoad.apk" target="blank">**HypLoad.apk**</a> et l'exécuter pour installer l'application, après cela vous êtes libres de l'utiliser !
 
 ### Fonctionnalités :
 * Traduction Française et Anglaise
