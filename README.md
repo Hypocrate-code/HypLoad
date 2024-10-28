@@ -12,7 +12,7 @@ The app is only available on **Android** mobile for now.
 
 
 ### Download HypLoad : 
-On Android, you just have to download this file -> <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.2.0.0/HypLoad.apk" target="blank">**HypLoad.apk**</a>, and execute it to install the app, then you're free to play with it !
+On Android, you just have to download this file -> <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.2.0.1/HypLoad.apk" target="blank">**HypLoad.apk**</a>, and execute it to install the app, then you're free to play with it !
 
 ### Features :
 * English and French traduction
@@ -24,6 +24,10 @@ On Android, you just have to download this file -> <a href="https://github.com/H
 * Dark theme / Light theme
 ### Available soon :
 * Portability on iOS (si demandé)
+
+### Credits :  
+This version of HypLoad is using under the hood [pytubefix](https://github.com/JuanBindez/pytubefix), thanks for his wonderful work.
+
 
 ### Small Overview :  
 
@@ -37,7 +41,7 @@ N'attendez pas et essayez là ! Cette app est entièrement gratuite, sans pubs e
 L'application n'est actuellement disponible que sur les téléphones fonctionnant sous **Android**.
 
 ### Téléchargement :
-Sous Android, vous n'avez qu'à télécharger le fichier en cliquant ici -> <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.2.0.0/HypLoad.apk" target="blank">**HypLoad.apk**</a> et l'exécuter pour installer l'application, après cela vous êtes libres de l'utiliser !
+Sous Android, vous n'avez qu'à télécharger le fichier en cliquant ici -> <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.2.0.1/HypLoad.apk" target="blank">**HypLoad.apk**</a> et l'exécuter pour installer l'application, après cela vous êtes libres de l'utiliser !
 
 ### Fonctionnalités :
 * Traduction Française et Anglaise
@@ -49,6 +53,9 @@ Sous Android, vous n'avez qu'à télécharger le fichier en cliquant ici -> <a h
 * Thème sombre / Thème clair
 ### DISPONIBLE BIENTÔT :
 * Portabilité sur iOS (si demandé)
+
+### Crédits :  
+Cette version de HypLoad utilise la librairie suivante : [pytubefix](https://github.com/JuanBindez/pytubefix), merci pour cette belle librairie.
 
 ### Petit Aperçu :  
 
