@@ -1,5 +1,8 @@
 import subprocess
 import os
+import sys
+if hasattr(sys, '_MEIPASS'):
+    os.environ['KIVY_NO_CONSOLELOG'] = '1'
 import time
 from urllib.error import URLError, HTTPError
 from kivy.config import Config
@@ -14,7 +17,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 import json
 from kivy.resources import resource_add_path, resource_find
 import threading
-from pytube import YouTube, Playlist
+from pytubefix import YouTube, Playlist
 from kivy.utils import platform
 from kivy.clock import mainthread
 from kivy.properties import ListProperty, NumericProperty
@@ -59,6 +62,7 @@ if platform == "android":
     elif width >= 4.5 and width < 5:
         scale_factor = 0.9
 elif platform == "win" or platform == "linux":
+    
     Window.size = (Window.height * 2 / 3, Window.height)
     dpi = Window.dpi
     print("the screen's dpi is : ", dpi)
@@ -101,7 +105,6 @@ class HypLoadApp(App):
         self.bg_color_for_video_res_btn = self.color(255, 44, 56, 190)
         # self.light_grey = self.color(248, 246, 246, 255)
         super(HypLoadApp, self).__init__(**kwargs)
-
     def color(self, r, g, b, a):
         return (r / 255, g / 255, b / 255, a / 255)
     def p_to_dp(self, pixels):
@@ -160,6 +163,7 @@ class HypLoadApp(App):
         sm.add_widget(SavedLinksScreen(name="saved_links_screen"))
         self.icon = "assets/hypload_icon.png"
         self.wait = False
+        print('build fait')
         return sm
 
     def on_start(self):
@@ -167,6 +171,7 @@ class HypLoadApp(App):
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
         sm.get_screen("options_and_infos_screen").get_and_set_color_of_the_app()
         sm.get_screen("choose_resolution_screen").set_video_res_btns()
+
         self.only_audio_btns = []
         for screen in sm.screens:
             if screen.ids.get("only_audio_btn_no_trad"):
@@ -283,7 +288,6 @@ class MusicSingleDownloadScreen(Screen):
         total_size = stream.filesize
         bytes_downloaded = total_size - bytes_remaining
         progress_value = (bytes_downloaded / total_size) * 100
-        print(progress_value)
         self.progress_bar.update_progress(None, progress_value)
 
     @mainthread
@@ -345,10 +349,6 @@ def change_check_box_img(instance):
 class Item_Of_List(GridLayout):
     def __init__(self, title, thumbnail, author, views, **kwargs):
         self.title = title
-        print(title)
-        print(thumbnail)
-        print(views)
-        print(views)
         with open("options.json") as options:
             options_read = options.read()
             options_json = json.loads(options_read)
@@ -496,7 +496,6 @@ class MusicPlaylistDownloadScreen(Screen):
         if getattr(self, "is_loading", None):
             parent = sm.get_screen("music_playlist_download_screen").children[0]
             parent.remove_widget(self.loading)
-            print("koa")
             parent.remove_widget(self.pb)
             parent.add_widget(self.container)
         else:
@@ -538,10 +537,8 @@ class MusicPlaylistDownloadScreen(Screen):
     @mainthread
     def cancel_or_finish(self, pa, container, pb, loading, type, title):
         self.is_loading = False
-        print(pa.children)
         pa.remove_widget(pb)
         pa.remove_widget(loading)
-        print(pa.children)
         with open('options.json', 'r', encoding="utf-8") as options:
             options_read = options.read()
             options_json = json.loads(options_read)
@@ -608,7 +605,6 @@ class MusicPlaylistDownloadScreen(Screen):
     @mainthread
     def add_a_video(self, video_stream):
         parent = sm.get_screen('playlist_screen').ids.playlist_loaded_no_trad
-        print(video_stream.views)
         widget = Item_Of_List(video_stream.title, f"https://img.youtube.com/vi/{video_stream.video_id}/0.jpg",
                               video_stream.author, video_stream.views)
         widget.stream = video_stream
@@ -634,7 +630,6 @@ class SavedLinksScreen(Screen):
                 options = json.loads(options_read)
             self.img = Image(size_hint = (None, None),size=(app.p_to_dp(850), app.p_to_dp(850)), pos_hint={'center_x': 0.5, 'center_y':0.5})
             self.img.source = f"assets/gideon_the_pigeon_{options['color_mode']}_{options['language']}.png"
-            print(Window.width)
             self.children[0].add_widget(self.img)
         else:
             for link in links_dict["links"]:
@@ -871,6 +866,8 @@ class PlaylistScreen(Screen):
                 else:
                     list_of_download_links.append(None)
                     list_of_types.append(None)
+            print(list_of_download_links)
+            print(list_of_types)
             if is_empty:
                 music_playlist_dl_screen.is_loading = False
                 self.back_btn()
@@ -1049,7 +1046,6 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                 if need_audio:
                     app.wait = True
                     try:
-                        print(good_one)
                         good_one.download(filename="video.mp4")
                         audio_for_merge = yt.streams.get_audio_only()
                         audio_for_merge.download(filename="audio.mp3")
@@ -1071,10 +1067,8 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                         print(os.listdir(os.getcwd()))
                         if platform == "android":
                             while not file_name in os.listdir(os.getcwd()):
-                                print(file_name, " alors que ", os.listdir(os.getcwd()))
                                 pass
                             convert_file_location(file_name, "video")
-                            print("après le convert_file_loc ", os.listdir(os.getcwd()))
                         app.wait = False
                     except Exception as e:
                         print(e)
@@ -1085,7 +1079,7 @@ def download_yt_music(self, url, first_to_rm, second_to_rm, parent, pb):
                         good_one.download(filename=file_name)
                         convert_file_location(file_name, "video")
                     elif platform == "win" or platform == "linux":
-                        good_one.download(filename=file_name, output_path="videos_for_pc_users")
+                        good_one.download(filename=file_name)
 
         except Exception as e:
             self.cancel_or_finish(first_to_rm, second_to_rm, parent, pb, "cancel")
@@ -1127,7 +1121,6 @@ def init_yt_playlist(self, url, pa, base_container, pb, loading):
         playlist = Playlist(url)
         self.init_interface(pa, pb, loading)
         percent = 50 / (len(playlist.videos) + 1)
-        print(playlist.title)
         total = 50
         self.pb.update_progress(None, total)
         self.add_title(playlist.title)
@@ -1145,34 +1138,36 @@ def init_yt_playlist(self, url, pa, base_container, pb, loading):
     except KeyError:
         self.cancel_or_finish(pa, base_container, pb, loading, "error", None)
     except Exception as e:
-        print("wtff", e)
-        print("wtff", type(e))
+        print(e, type(e))
         self.cancel_or_finish(pa, base_container, pb, loading, "error", None)
 
 
 def download(stream, type, title):
     if type == "video":
         need_audio = False
-        options = check_dl_preferencies_single()
-        if options[1] == "highest":
+        with open("options.json") as file:
+            options_read = file.read()
+            options_json = json.loads(options_read)
+            options = options_json["video_res"]
+        if options == "highest":
             good_one = stream.streams.get_highest_resolution()
-        elif options[1] == "lowest":
+        elif options == "lowest":
             good_one = stream.streams.get_lowest_resolution()
-        elif options[1] == "144p":
+        elif options == "144p":
             good_one = stream.streams.get_by_itag(160)
             need_audio = True
-        elif options[1] == "240p":
+        elif options == "240p":
             good_one = stream.streams.get_by_itag(133)
             need_audio = True
-        elif options[1] == "360p":
+        elif options == "360p":
             good_one = stream.streams.get_by_itag(18)
             need_audio = True
-        elif options[1] == "480p":
+        elif options == "480p":
             need_audio = True
             good_one = stream.streams.get_by_itag(135)
-        elif options[1] == "720p":
+        elif options == "720p":
             good_one = stream.streams.get_by_itag(22)
-        elif options[1] == "1080p":
+        elif options == "1080p":
             good_one = stream.streams.get_by_itag(137)
             need_audio = True
         if platform == "win" or platform == "linux":
@@ -1279,7 +1274,6 @@ def check_if_file_is_downloaded(title, type):
         print(source in os.listdir(place_of_file))
         return source in os.listdir(place_of_file)
     elif platform == "win" or platform == "linux":
-        print("le titre est ", title, " et le type est ", type)
         if type == "audio":
             source = title + ".mp3"
         elif type == "video":
