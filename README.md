@@ -1,5 +1,6 @@
 # HypLoad ![HypLoad_logo](https://github.com/Hypocrate-code/HypLoad/assets/112576942/85239fef-51fd-46b4-bc26-02ee11d4ba98)
 
+## Deprecated for Android, now working on a Desktop version
 
 ### Traductions :
 * [English](#en)
