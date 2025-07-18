@@ -1,0 +1,204 @@
+
+<!-- HypLoad is a smart software made to download YouTube videos & playlists. Acts as a clean GUI yt-dlp.
+    Copyright (C) 2025  Hypocrate (Thibaut Alvoet)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HypLoad</title>
+    <link rel="stylesheet" href="../css/global.css">
+</head>
+<body class="isLoading">
+    <div class="btn-window">
+        <button onclick="hyploadAPI.minimize()"></button>
+        <button onclick="hyploadAPI.maximize()">
+
+            <svg viewBox="0 0 14 13.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="path-1-inside-1_752_120" fill="var(--background-of-the-app)">
+                <path d="M10.9 9.9001V8.90007V8.23013V3.77006C10.8999 3.40006 10.6 3.10012 10.23 3.10012H5.76994H5.1H4.09998C4.09998 3.10012 4.09998 2.1001 5.1 2.1001H10.23C11.1523 2.1001 11.8999 2.84776 11.9 3.77006V8.90007C11.9 9.9001 10.9 9.9001 10.9 9.9001Z"/>
+                </mask>
+                <path d="M10.9 9.9001V8.90007V8.23013V3.77006C10.8999 3.40006 10.6 3.10012 10.23 3.10012H5.76994H5.1H4.09998C4.09998 3.10012 4.09998 2.1001 5.1 2.1001H10.23C11.1523 2.1001 11.8999 2.84776 11.9 3.77006V8.90007C11.9 9.9001 10.9 9.9001 10.9 9.9001Z" fill="var(--primary-color)"/>
+                <path d="M10.9 9.9001H9.89995V10.9001H10.9V9.9001ZM10.9 3.77006L11.9 3.77006L11.9 3.76995L10.9 3.77006ZM4.09998 3.10012H3.09998V4.10012H4.09998V3.10012ZM11.9 3.77006L12.9 3.77006L12.9 3.77002L11.9 3.77006ZM10.9 8.90007H9.89995V9.9001H10.9H11.9V8.90007H10.9ZM10.9 8.23013H11.9V3.77006H10.9H9.89995V8.23013H10.9ZM10.9 3.77006L11.9 3.76995C11.8998 2.84786 11.1524 2.10012 10.23 2.10012V3.10012V4.10012C10.0476 4.10012 9.89997 3.95225 9.89995 3.77018L10.9 3.77006ZM10.23 3.10012V2.10012H5.76994V3.10012V4.10012H10.23V3.10012ZM5.76994 3.10012V2.10012H5.1V3.10012V4.10012H5.76994V3.10012ZM4.09998 3.10012C5.09998 3.10012 5.09998 3.10061 5.09998 3.10109C5.09997 3.10125 5.09997 3.10173 5.09997 3.10204C5.09997 3.10266 5.09997 3.10328 5.09997 3.10388C5.09996 3.10508 5.09996 3.10623 5.09995 3.10733C5.09993 3.10954 5.09991 3.11155 5.09988 3.11338C5.09982 3.11703 5.09974 3.11996 5.09966 3.12221C5.09952 3.12668 5.09937 3.12861 5.09939 3.1284C5.09944 3.12764 5.10003 3.12003 5.10199 3.10827C5.1067 3.08001 5.11426 3.05761 5.11941 3.04732C5.12259 3.04095 5.11167 3.065 5.07656 3.0884C5.03519 3.11598 5.02498 3.1001 5.1 3.1001V2.1001V1.1001C4.67501 1.1001 4.28978 1.20922 3.96716 1.4243C3.6508 1.63521 3.45237 1.90926 3.33055 2.1529C3.21069 2.39261 3.15575 2.62023 3.12921 2.77947C3.11554 2.86146 3.10832 2.93198 3.10447 2.98591C3.10253 3.01304 3.10141 3.03646 3.10077 3.05558C3.10046 3.06515 3.10026 3.07369 3.10014 3.08113C3.10008 3.08485 3.10004 3.08829 3.10001 3.09146C3.1 3.09305 3.09999 3.09456 3.09998 3.096C3.09998 3.09673 3.09998 3.09743 3.09998 3.09812C3.09998 3.09846 3.09998 3.09896 3.09998 3.09913C3.09998 3.09963 3.09998 3.10012 4.09998 3.10012ZM5.1 2.1001V3.1001H10.23V2.1001V1.1001H5.1V2.1001ZM10.23 2.1001V3.1001C10.6 3.1001 10.9 3.40001 10.9 3.77011L11.9 3.77006L12.9 3.77002C12.8999 2.29551 11.7047 1.1001 10.23 1.1001V2.1001ZM11.9 3.77006H10.9V8.90007H11.9H12.9V3.77006H11.9ZM11.9 8.90007H10.9C10.9 8.97509 10.8841 8.96488 10.9117 8.92351C10.9351 8.88841 10.9591 8.87748 10.9527 8.88067C10.9425 8.88581 10.9201 8.89337 10.8918 8.89808C10.88 8.90004 10.8724 8.90063 10.8717 8.90069C10.8715 8.9007 10.8734 8.90056 10.8779 8.90041C10.8801 8.90033 10.883 8.90026 10.8867 8.9002C10.8885 8.90017 10.8905 8.90014 10.8927 8.90013C10.8938 8.90012 10.895 8.90011 10.8962 8.90011C10.8968 8.9001 10.8974 8.9001 10.898 8.9001C10.8983 8.9001 10.8988 8.9001 10.899 8.9001C10.8995 8.9001 10.9 8.9001 10.9 9.9001C10.9 10.9001 10.9004 10.9001 10.9009 10.9001C10.9011 10.9001 10.9016 10.9001 10.902 10.9001C10.9026 10.9001 10.9033 10.9001 10.9041 10.9001C10.9055 10.9001 10.907 10.9001 10.9086 10.9001C10.9118 10.9 10.9152 10.9 10.9189 10.8999C10.9264 10.8998 10.9349 10.8996 10.9445 10.8993C10.9636 10.8987 10.987 10.8975 11.0142 10.8956C11.0681 10.8918 11.1386 10.8845 11.2206 10.8709C11.3798 10.8443 11.6075 10.7894 11.8472 10.6695C12.0908 10.5477 12.3649 10.3493 12.5758 10.0329C12.7909 9.71029 12.9 9.32506 12.9 8.90007H11.9ZM10.9 8.90007H11.9V8.23013H10.9H9.89995V8.90007H10.9ZM5.1 3.10012V2.10012H4.09998V3.10012V4.10012H5.1V3.10012Z" fill="var(--primary-color)" mask="url(#path-1-inside-1_752_120)"/>
+                <path d="M8.65955 10.8999V11.8999H3.54041V10.8999H8.65955ZM10.1 10.4595C10.1 11.2548 9.45484 11.8999 8.65955 11.8999V10.8999C8.90255 10.8999 9.09998 10.7025 9.09998 10.4595V4.8999H3.54041C3.2974 4.8999 3.09998 5.09733 3.09998 5.34033V10.4595C3.09998 10.7025 3.2974 10.8999 3.54041 10.8999V11.8999L3.39294 11.8921C2.66674 11.8184 2.09998 11.2051 2.09998 10.4595V5.34033C2.09998 4.59469 2.66674 3.98138 3.39294 3.90771L3.54041 3.8999H9.33044L9.40857 3.90381C9.79676 3.94316 10.0997 4.27092 10.1 4.66943V10.4595Z" fill="var(--primary-color)"/>
+            </svg>
+
+        </button>
+        <button onclick="hyploadAPI.close()">
+            <?xml version="1.0" encoding="utf-8"?>
+            <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="Menu / Close_MD">
+                <path id="Vector" d="M18 18L12 12M12 12L6 6M12 12L18 6M12 12L6 18" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+            </svg>
+        </button>
+    </div>
+    <section class="Accueil active">
+        <p>Welcome to <b>HypLoad</b>,<br/>your personnal Youtube<br>video downloader.</p>
+        <div class="small-divider"></div>
+        <div class="btn-container">
+            <button onclick="goTo('DownloadSingle', 1, null)">Download a video</button>
+            <button onclick="goTo('DownloadPlaylist', 1, null)">Download a playlist</button>
+            <button onclick="goTo('Playlists', 1, null)">My playlists saved</button>
+            <button onclick="goTo('Options', 1, null)">Options and infos</button>
+        </div>
+        <p id="author">developed by Hypocrate</p>
+    </section>
+
+    <section class="DownloadSingle">
+        <button class="returnBtn" onclick="goTo('Accueil', -1, resetSection)">
+            <div class="arrow"></div>
+        </button>
+        <p>Enter the link of your <b>YouTube</b> video</p>
+        <div class="link-container">
+            <input type="text" placeholder="Your YouTube video's link"><button onclick="launchDownloadSingle()">Download</button>
+        </div>
+        <button class="switchMode" onclick="switchMode()">
+            
+            <!-- "../assets/audio.svg" -->
+
+            <svg width="99" height="84" viewBox="0 0 99 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 33.0368C0 28.2053 3.95752 24.2886 8.83937 24.2886H53.0362V59.2814H8.83937C3.95752 59.2814 0 55.3647 0 50.5332V33.0368Z" fill="var(--color)"/>
+                <path d="M53.036 7.2778V25.2569H22.3611C40.2683 9.70832 53.036 -11.1878 53.036 7.2778Z" fill="var(--color)"/>
+                <path d="M53.036 76.3433V58.3642H22.3611C40.2683 73.9128 53.036 94.8089 53.036 76.3433Z" fill="var(--color)"/>
+                <path d="M65.578 21.7293C67.224 20.0494 69.901 19.957 71.6598 21.4815L71.8277 21.6344L72.1346 21.9353C75.3244 25.1178 78.9197 30.5986 80.0043 37.4107C81.1599 44.6695 79.3951 53.0692 72.0493 61.2206C70.4246 63.0234 67.6308 63.1815 65.8091 61.5737C63.9875 59.9658 63.8277 57.2008 65.4523 55.3979C71.0707 49.1635 72.0073 43.3879 71.2724 38.772C70.5495 34.2316 68.1414 30.4663 66.0806 28.3218L65.6739 27.9145L65.5147 27.7541C63.9205 26.0611 63.9318 23.4094 65.578 21.7293Z" fill="var(--color)"/>
+                <path d="M80.5605 7.88614C82.3914 6.28854 85.1834 6.46234 86.7977 8.27438C96.0335 18.6418 108.781 46.2963 86.9972 74.5704C85.5171 76.4913 82.7441 76.861 80.8031 75.3962C78.8622 73.9314 78.4886 71.187 79.9687 69.266C98.3434 45.4171 87.6653 22.4747 80.1682 14.0591C78.5539 12.247 78.7295 9.48374 80.5605 7.88614Z" fill="var(--color)"/>
+            </svg>
+
+            <!-- <svg width="169" height="120" viewBox="0 0 169 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="169" height="120" rx="13" fill="var(--primary-color)"/>
+                <rect x="14" y="12" width="13" height="20" rx="3" fill="var(--background-of-the-app)"/>
+                <rect x="14" y="88" width="13" height="20" rx="3" fill="var(--background-of-the-app)"/>
+                <rect x="14" y="48" width="13" height="20" rx="3" fill="var(--background-of-the-app)"/>
+                <rect x="142" y="12" width="13" height="20" rx="3" fill="var(--background-of-the-app)"/>
+                <rect x="142" y="88" width="13" height="20" rx="3" fill="var(--background-of-the-app)"/>
+                <rect x="142" y="48" width="13" height="20" rx="3" fill="var(--background-of-the-app)"/>
+                <path d="M110.5 57.4019C112.5 58.5566 112.5 61.4434 110.5 62.5981L70 85.9808C68 87.1355 65.5 85.6921 65.5 83.3827V36.6173C65.5 34.3079 68 32.8645 70 34.0192L110.5 57.4019Z" fill="var(--background-of-the-app)"/>
+            </svg> -->
+
+            <p>Audio only</p>
+        </button>
+        <div class="progressDlBar">
+            <div class="progressDlDot"></div>
+        </div>
+    </section>
+
+    <section class="DownloadPlaylist">
+        <button class="returnBtn" onclick="goTo('Accueil', -1, resetSection)">
+            <div class="arrow"></div>
+        </button>
+        <p>Enter the link of your <b>YouTube</b> playlist</p>
+        <div class="link-container">
+            <input type="text" placeholder="Your YouTube playlist's link"><button onclick="launchLoadPlaylist()">Validate</button>
+        </div>
+        <button class="switchMode" onclick="switchMode()">
+            
+            <!-- "../assets/audio.svg" -->
+
+            <svg width="99" height="84" viewBox="0 0 99 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 33.0368C0 28.2053 3.95752 24.2886 8.83937 24.2886H53.0362V59.2814H8.83937C3.95752 59.2814 0 55.3647 0 50.5332V33.0368Z" fill="var(--color)"/>
+                <path d="M53.036 7.2778V25.2569H22.3611C40.2683 9.70832 53.036 -11.1878 53.036 7.2778Z" fill="var(--color)"/>
+                <path d="M53.036 76.3433V58.3642H22.3611C40.2683 73.9128 53.036 94.8089 53.036 76.3433Z" fill="var(--color)"/>
+                <path d="M65.578 21.7293C67.224 20.0494 69.901 19.957 71.6598 21.4815L71.8277 21.6344L72.1346 21.9353C75.3244 25.1178 78.9197 30.5986 80.0043 37.4107C81.1599 44.6695 79.3951 53.0692 72.0493 61.2206C70.4246 63.0234 67.6308 63.1815 65.8091 61.5737C63.9875 59.9658 63.8277 57.2008 65.4523 55.3979C71.0707 49.1635 72.0073 43.3879 71.2724 38.772C70.5495 34.2316 68.1414 30.4663 66.0806 28.3218L65.6739 27.9145L65.5147 27.7541C63.9205 26.0611 63.9318 23.4094 65.578 21.7293Z" fill="var(--color)"/>
+                <path d="M80.5605 7.88614C82.3914 6.28854 85.1834 6.46234 86.7977 8.27438C96.0335 18.6418 108.781 46.2963 86.9972 74.5704C85.5171 76.4913 82.7441 76.861 80.8031 75.3962C78.8622 73.9314 78.4886 71.187 79.9687 69.266C98.3434 45.4171 87.6653 22.4747 80.1682 14.0591C78.5539 12.247 78.7295 9.48374 80.5605 7.88614Z" fill="var(--color)"/>
+            </svg>
+
+            <p>Audio only</p>
+        </button>
+        <div class="progressDlBar">
+            <div class="progressDlDot"></div>
+        </div>
+    </section>
+
+    <section class="LoadedPlaylist">
+        <button class="returnBtn" onclick="goTo('DownloadPlaylist', -1, resetSection)">
+            <div class="arrow"></div>
+        </button>
+        <p class="name-of-playlist"><b>HypLoad</b><br/>Name of the playlist</p>
+        <div class="small-divider"></div>
+        <div class="scrollContainer">
+            <div class="videoContainer">
+    
+            </div>
+        </div>
+        <div class="btn-container">
+            <button onclick="launchDownloadPlaylist()">Start downloading list</button>
+        </div>
+    </section>
+
+    <section class="Playlists">
+        <button class="returnBtn" onclick="goTo('Accueil', -1, null)">
+            <div class="arrow"></div>
+        </button>
+        <p>Your downloaded playlists.</p>
+        <div class="small-divider"></div>
+        <div class="scrollContainer">
+            <div class="btn-container">
+                <p>No playlist loaded yet.</p>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="Options">
+        <button class="returnBtn" onclick="goTo('Accueil', -1, null)">
+            <div class="arrow"></div>
+        </button>
+        <div class="btn-container">
+            <button id="colorMode" onclick="switchColorMode()">Dark mode</button>
+            <button onclick="goTo('ChangeResolution', 1, null)">Video resolution</button>
+            <button onclick="goTo('ChangeLanguage', 1, null)">Change the language</button>
+            <button onclick="hyploadAPI.open('https:\/\/Hypocrate-code.github.io/Hypload_desktop')">How to use HypLoad ?</button>
+            <button onclick="hyploadAPI.open('https:\/\/hypocrate.dev')">Who is Hypocrate ?</button>
+        </div>
+    </section>
+
+    <section class="ChangeLanguage">
+        <button class="returnBtn" onclick="goTo('Options', -1, null)">
+            <div class="arrow"></div>
+        </button>
+        <div class="btn-container">
+            <button onclick="hyploadAPI.changeLanguage('en')">English 🍵</button>
+            <button onclick="hyploadAPI.changeLanguage('fr')">Français 🥖</button>
+        </div>
+    </section>
+
+    <section class="ChangeResolution">
+        <button class="returnBtn" onclick="goTo('Options', -1, null)">
+            <div class="arrow"></div>
+        </button>
+        <p>Resolution of the<br/>downloaded videos.</p>
+        <div class="small-divider"></div>
+        <div class="btn-container">
+            <button res='bv' onclick="changeResolution('bv')">Highest available</button>
+            <div class="customRes">
+                <button res='1080' onclick="changeResolution('1080')">1080p</button>
+                <button res='720' onclick="changeResolution('720')">720p</button>
+                <button res='480' onclick="changeResolution('480')">480p</button>
+                <button res='360' onclick="changeResolution('360')">360p</button>
+                <button res='240' onclick="changeResolution('240')">240p</button>
+                <button res='144' onclick="changeResolution('144')">144p</button>
+            </div>
+            <button res='wv' onclick="changeResolution('wv')">Lowest available</button>
+        </div>
+    </section>
+
+    <script type="module" src="../renderer.js"></script>
+
+</body>
+</html>

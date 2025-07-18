@@ -1,0 +1,776 @@
+
+/* HypLoad is a smart software made to download YouTube videos & playlists. Acts as a clean GUI yt-dlp.
+    Copyright (C) 2025  Hypocrate (Thibaut Alvoet)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
+
+:root {
+    --dark-background-of-the-app: #16202f;
+    --dark-primary-color: #f6f5ff;
+
+    --dark-text-input-bg: #424242;
+    --dark-light-grey: #303030;
+    --dark-bg-color-for-video-res-btn: #ff2c38;
+
+    --light-background-of-the-app: #FBFBFB;
+    --light-primary-color: #214FDA;
+
+    --background-of-the-app: var(--light-background-of-the-app);
+    --primary-color: var(--light-primary-color);    
+    --box-shadow-as-border: 0px 0px 0px var(--trait-width) var(--primary-color);
+
+    --translateY: -.7rem;
+    --translateX-screen: 1.4rem;
+    --trait-width: .077rem;
+    --bold-font: "Geologica-Bold";
+    --medium-font: "Geologica-Medium";
+    --regular-font: "Geologica-Regular";
+    --normal-font: "Geologica-Light";
+    --light-font: "Geologica-ExtraLight";
+    --bouncy-bezier: cubic-bezier(.66,.19,.43,1.51);
+    --boosted-ease-in: cubic-bezier(.42,0,.9,.75);
+    --boosted-ease-out: cubic-bezier(.12,.25,.44,1);
+
+}
+
+*,
+*::before,
+*::after {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: "Geologica-Bold";
+    src: url("../fonts/Geologica/Geologica-Bold.ttf");
+}
+@font-face {
+    font-family: "Geologica-Medium";
+    src: url("../fonts/Geologica/Geologica-Medium.ttf");
+}
+@font-face {
+    font-family: "Geologica-Regular";
+    src: url("../fonts/Geologica/Geologica-Regular.ttf");
+}
+@font-face {
+    font-family: "Geologica-Regular";
+    src: url("../fonts/Geologica/Geologica-Regular.ttf");
+}
+@font-face {
+    font-family: "Geologica-Light";
+    src: url("../fonts/Geologica/Geologica-Light.ttf");
+}
+@font-face {
+    font-family: "Geologica-ExtraLight";
+    src: url("../fonts/Geologica/Geologica-ExtraLight.ttf");
+}
+
+html {
+    font-size: 23px;
+}
+body {
+    background: var(--background-of-the-app);
+    font-family: var(--normal-font);
+    color: var(--primary-color);
+    display: flex;
+    overflow: hidden;
+    padding: .7em;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    app-region: drag;
+}
+
+body::before,
+body::after {
+    position: absolute;
+    content: '';
+}
+body.isLoading::before {
+    display: block;
+}
+body::before {
+    display: none;
+    inset: 0;
+    background: var(--background-of-the-app);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 7.4em;
+    background-image: url("../assets/icon.png");
+    z-index: 20;
+    animation: loader .277s ease-in-out .44s forwards;
+}
+
+@keyframes loader {to {opacity: 0;}}
+
+body::after {
+    display: block;
+    z-index: -1;
+    inset: .7em;
+    border-radius: .19em;
+    box-shadow: var(--box-shadow-as-border);
+}
+
+section {
+    display: none;
+    width: 100%;
+    flex-shrink: 0;
+    gap: .8em;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+}
+
+button, input, a {
+    app-region: no-drag !important;
+}
+
+b {
+    font-family: var(--bold-font);
+    color: #E5211E;
+    transform: skewX(-9deg);
+    display: inline-block;
+}
+
+
+/* Return Btn et animation de switch screen */
+
+
+.returnBtn {
+    --size: 3.3em;
+    position: absolute;
+    background-color: transparent;
+    box-shadow: none;
+    border-radius: .1em;
+    overflow: hidden;
+    top: 2em;
+    left: 1.3em;
+    width: var(--size);
+    height: var(--size);
+    /* background: var(--primary-color); */
+}
+
+.returnBtn .arrow {
+    position: relative;
+    transform: translateX(.25em);
+    transition: transform ease-in-out .2s;
+    transition-delay: .05s;
+}
+
+.returnBtn:hover,
+.returnBtn:focus-visible {
+    outline: none;
+    background: transparent;
+}
+.returnBtn::before {
+    width: calc(var(--trait-width) * 1.2);
+    height: 65%;
+    content: "";
+    position: absolute;
+    top: 17.5%;
+    left: 7.5%;
+    transform-origin: right;
+    transform: scaleX(0);
+    transition: transform ease-in-out .2s;
+    background: var(--primary-color);
+}
+.returnBtn:focus-visible::before,
+.returnBtn:hover::before {
+    transform: scaleX(1);
+    transition-delay: .15s;
+}
+
+.returnBtn .arrow::before,
+.returnBtn .arrow::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 1.5em;
+    left: 30%;
+    height: var(--trait-width);
+    background: var(--primary-color);
+    transform-origin: left;
+    border-radius: 1em;
+    transform: translateX(-.035em);
+    transition: rotate ease-in-out .2s;
+    transition-delay: .05s;
+}
+.returnBtn .arrow::before {
+    rotate: 40deg;
+}
+.returnBtn .arrow::after {
+    rotate: -40deg;
+}
+
+.returnBtn:focus-visible .arrow,
+.returnBtn:hover .arrow {
+    transform: none;
+    transition-delay: 0;
+}
+.returnBtn:hover .arrow::before,
+.returnBtn:focus-visible .arrow::before {
+    rotate: 37.5deg;
+    transition-delay: 0;
+
+}
+.returnBtn:hover .arrow::after,
+.returnBtn:focus-visible .arrow::after {
+    rotate: -37.5deg;
+    transition-delay: 0;
+}
+.leavingScreenLeft,
+.enteringScreenRight,
+.leavingScreenRight,
+.enteringScreenLeft {
+    pointer-events: none;
+}
+
+.leavingScreenLeft {
+    animation: leaving-screen-left .15s var(--boosted-ease-in) forwards;
+}
+.enteringScreenRight {
+    animation: entering-screen-right .25s var(--boosted-ease-out) forwards;
+}
+
+@keyframes leaving-screen-left {
+    to {
+        transform: translateX(calc( -1 * var(--translateX-screen)));
+        filter: opacity(0%);
+    }
+}
+@keyframes entering-screen-right {
+    from {
+        transform: translateX( var(--translateX-screen));
+        filter: opacity(0%);
+    }
+}
+.leavingScreenRight {
+    animation: leaving-screen-right .15s var(--boosted-ease-in) forwards;
+}
+.enteringScreenLeft {
+    animation: entering-screen-left .25s var(--boosted-ease-out) forwards;
+}
+
+@keyframes leaving-screen-right {
+    to {
+        transform: translateX(var(--translateX-screen));
+        filter: opacity(0%);
+    }
+}
+@keyframes entering-screen-left {
+    from {
+        transform: translateX( calc( -1 * var(--translateX-screen)));
+        filter: opacity(0%);
+    }
+}
+
+
+/* FIN Return Btn et animation de switch screen */
+
+
+.btn-window {
+    --space: .4rem;
+    --size-btn: .9rem;
+    --size-svg: 97%;
+    position: absolute;
+    top: .8rem;
+    right: .8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space);
+    gap: var(--space);
+    width: max-content;
+    height: max-content;
+}
+.btn-window button * {
+    transition: none;
+}
+.btn-window button {
+    transition: none;
+    z-index: 10;
+    display: flex;
+    width: var(--size-btn);
+    height: var(--size-btn);
+    background: var(--background-of-the-app);
+    box-shadow: var(--box-shadow-as-border);
+    cursor: pointer;
+    position: relative;
+}
+.btn-window button svg {
+    width: var(--size-svg);
+    height: var(--size-svg);
+    margin-inline: auto;
+    margin-top: calc( (var(--size-btn) - (var(--size-btn) * var(--size-svg)))/2 );
+}
+.btn-window button:focus-visible svg *,
+.btn-window button:hover svg * {
+    --primary-color: var(--background-of-the-app);
+}
+
+#colorMode {text-transform: capitalize;}
+
+.btn-window button:nth-last-child(1) {
+    --primary-color: #ff1310  !important;
+    --box-shadow-as-border: 0px 0px 0px var(--trait-width) #ff1310;
+}
+.btn-window button:nth-last-child(1):focus-visible,
+.btn-window button:nth-last-child(1):hover {
+    --primary-color: #E5211E !important;
+    --box-shadow-as-border: 0px 0px 0px var(--trait-width) #E5211E;
+}
+
+.btn-window button:nth-child(1)::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 17.5%;
+    transform: translateY(-50%);
+    width: 65%;
+    height: 0.07rem;
+    border-radius: .05rem;
+    background: var(--primary-color);
+}
+.btn-window button:nth-child(1):focus-visible::before,
+.btn-window button:nth-child(1):hover::before {
+    background: var(--background-of-the-app);
+}
+
+
+.small-divider {
+    height: calc(var(--trait-width) * 1.2);
+    border-radius: 2rem;
+    width: .44rem;
+    transform: translateY(calc(-100% + var(--translateY))) !important;
+    background: var(--primary-color);
+}
+
+
+.active {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+    position: relative;
+}
+.inactive {
+    visibility: hidden !important;
+    display: none !important;
+}
+.Accueil > * {
+    transform: translateY(var(--translateY));
+}
+.btn-container {
+    display: flex;
+    gap: .7em;
+    max-width: 10.3em;
+    width: 100%;
+    flex-direction: column;
+}
+
+button {
+    appearance: none;
+    user-select: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    border: none;
+    font-family: var(--normal-font);
+    border-radius: .23em;
+    box-shadow: var(--box-shadow-as-border);
+    background: var(--background-of-the-app);
+    text-align: left;
+    transition: all ease-in-out .2s;
+}
+button > svg {
+    height: auto;
+    width: 1.35em;
+}
+button > svg * {
+    --color: var(--primary-color);
+    --bg-color: var(--background-of-the-app);
+    transition: fill ease-in-out .2s;
+}
+button:focus-visible>svg *,
+button:hover>svg * {
+    --color: var(--background-of-the-app);
+    --bg-color: var(--primary-color);
+}
+.btn-container button {
+    padding: .6em .63em;
+    padding-right: 2em;
+    font-size: .798em;
+    letter-spacing: -.05em;
+    position: relative;
+}
+
+.btn-container button::after,
+.btn-container button::before {
+    content: '';
+    display: block;
+    width: .7em;
+    height: var(--trait-width);
+    background: var(--background-of-the-app);
+    position: absolute;
+    right: 1em;
+    transform-origin: right;
+    opacity: 0;
+    transition: transform var(--bouncy-bezier) .25s .1s, opacity ease-in-out .1s .1s;
+    border-radius: 1em;
+}
+.btn-container button::after {
+    top: calc(50% - var(--trait-width)/2);
+    rotate: 40deg;
+    transform: translateX(calc( cos(-40deg) * -.7em)) translateY(calc( sin(-40deg) * -.7em));
+}
+.btn-container button::before {
+    bottom: calc(50% - var(--trait-width)/2);
+    rotate: -40deg;
+    transform: translateX(calc( cos(40deg) * -.7em)) translateY(calc( sin(40deg) * -.7em));
+}
+.activeResolution,
+button:hover,
+button:focus-visible {
+    background: var(--primary-color);
+    border-radius: .28em;
+    outline: none;
+    font-family: var(--normal-font);
+    color: var(--background-of-the-app);
+}
+.btn-container button:hover::after,
+.btn-container button:hover::before,
+.btn-container button:focus-visible::after,
+.btn-container button:focus-visible::before {
+    transform: none;
+    opacity: 1;
+}
+
+section>p {
+    /* max-width: 15em; */
+    text-align: center;
+    white-space: pre-wrap;
+    line-height: 138%;
+    letter-spacing: -.05em;
+    font-size: .83em;
+}
+.Accueil>p {
+    font-size: 1em;
+}
+.Accueil>p,
+.ChangeResolution>p {
+    line-height: 118%;
+    max-width: 15em;
+    letter-spacing: -.034em;
+}
+.link-container {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    width: 13em;
+    margin-bottom: .1em;
+}
+.link-container > * {
+    --radius: .35em;
+    letter-spacing: -.035em;
+    font-size: .7em;
+    padding: 0.3em .4em;
+    padding-bottom: .35em;
+    font-family: var(--normal-font);
+    /* letter-spacing: -.015em; */
+}
+.link-container > input {
+    /* height: 1.8em; */
+    border: none;
+    width: 100%;
+    padding-left: .45em;
+    background: var(--background-of-the-app);
+    box-shadow: calc(var(--trait-width)/2) calc(var(--trait-width)/1.6) 0 calc(var(--trait-width)/2.4) var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 0 0 0 var(--radius);
+    transition: all ease-in-out .2s;
+}
+.link-container > button {
+    border-radius: .35em;
+    padding: 0.3em .3em;
+    border-radius: calc(var(--radius)/3) calc(var(--radius)/1.5) calc(var(--radius)/1.5) 0;
+}
+.switchMode {
+    display: flex;
+    gap: .3em;
+    font-size: .7em;
+    padding: 0.3em .4em;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: -.05em;
+}
+
+.link-container > input::placeholder {
+    color: var(--primary-color);
+    opacity: .8;
+}
+
+.link-container>*:hover,
+.link-container>*:focus {
+    outline: none;
+    --radius: .375em;
+}
+
+
+
+#author {
+    display: inline-block;
+    font-size: .77em;
+    font-family: var(--light-font);
+    /* font-style: italic; */
+    letter-spacing: -.04em;
+    transform: skewX(-7deg);
+    position: absolute;
+    bottom: 1.4em;
+}
+
+
+
+.LoadedPlaylist {
+    grid-template-rows: auto auto 1fr;
+    gap: .5em;
+    padding-top: .77em;
+}
+.LoadedPlaylist.active {
+    display: grid !important;
+}
+.LoadedPlaylist > * {
+    margin-inline: auto;
+}
+.LoadedPlaylist > p {
+    width: 12em;
+    line-height: 120%;
+}
+.LoadedPlaylist > p > b {
+    font-size: .77em;
+}
+.ChangeResolution > .small-divider,
+.LoadedPlaylist > .small-divider {
+    /* margin-block: .5em; */
+    transform: translateY(-100%) !important;
+}
+.scrollContainer {
+    app-region: no-drag;
+    max-width: 14.6em;
+    padding: calc(var(--trait-width) * 2) 1em;
+    height: 100%;
+    overflow-y: auto;
+    /* position: relative; */
+}
+.scrollContainer .btn-container p {
+    letter-spacing: -0.05em;
+}
+.scrollContainer::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 4rem;
+    width: 20rem;
+    /* background: transparent; */
+    background: radial-gradient(ellipse at bottom center, var(--light-primary-color) 0%, transparent 71%);
+    opacity: 0.25;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.videoContainer {
+    width: 100%;
+    transform: none !important;
+    display: flex;
+    flex-direction: column;
+    gap: .55em;
+    margin-bottom: 3.4em;
+}
+.video {
+    padding: .47em;
+    font-size: .83em;
+    min-height: 3.51em;
+    height: 3.51em;
+    display: grid;
+    box-shadow: var(--box-shadow-as-border);
+    grid-template-columns: 3.44em 1fr max-content;
+    grid-template-rows: 100%;
+    border-radius: .23em;
+}
+.video-info {
+    min-width: 0;
+    padding-left: .44em;
+    padding-right: .2em;
+}
+.Playlists button,
+.LoadedPlaylist p {
+    white-space: nowrap;       /* pas de retour à la ligne */
+    overflow: hidden;          /* cache le texte qui dépasse */
+    text-overflow: ellipsis;
+    display: block;
+}
+.video-info p {
+    font-size: .7em;
+    letter-spacing: -.03em;
+}
+.title {
+    font-family: var(--regular-font);
+    font-size: .72em !important;
+    transform: translateY(-.2em);
+}
+.views {
+    /* font-family: var(--light-font); */
+    font-size: .61em !important;
+    transform: translateY(-0.4em) translateX(0.25em) skewX(-10deg);
+}
+.uploader {
+    font-family: var(--regular-font);
+    font-size: .67em !important;
+    margin-top: .17em;
+    padding-left: .45em;
+    position: relative;
+}
+.uploader::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    height: 85%;
+    width: var(--trait-width);
+    background: var(--primary-color);
+    border-radius: 0 var(--trait-width) var(--trait-width) 0;
+    top: 7.5%;
+}
+
+.thumbnail {
+    height: 100%;
+    width: 100%;
+    box-shadow: var(--box-shadow-as-border);
+    border-radius: .12em;
+    background-position: center;
+    background-size: 140%;
+}
+.option-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: .5em;
+    margin-left: .25em;
+}
+.option-container > * {
+    border-radius: .2em;
+    background: var(--background-of-the-app);
+}
+.format {
+    width: 1.5em;
+    height: 1.5em;
+    box-shadow: none;
+}
+.format svg {
+    width: 100%;
+}
+.format:focus-visible,
+.format:hover {
+    background: var(--background-of-the-app);
+}
+.format:focus-visible svg *,
+.format:hover svg * {
+    --color: var(--primary-color);
+}
+.toDownload {
+    font-size: 0.7em;
+    width: 1.35em;
+    height: 1.35em;
+}
+.notDownloadable .toDownload svg {
+    display: none;
+}
+.toDownload svg {
+    transform: translateY(-0.15em) translateX(0.2em) scale(1.15);
+}
+.toDownload:focus-visible,
+.toDownload:hover {
+    background: var(--background-of-the-app);
+}
+
+.LoadedPlaylist > .btn-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: .85em;
+}
+
+
+
+.progressDlBar {
+    width: 13em;
+    display: none;
+    --radius: .35em;
+    border-radius: var(--radius);
+    padding: .2em .4em;
+    box-shadow: var(--box-shadow-as-border);
+    background: var(--background-of-the-app);
+    height: 1.397em;
+}
+.progressDlDot {
+    --small-radius: calc(var(--radius) / 1.75);
+    background: var(--primary-color);
+    position: relative;
+    height: 100%;
+    width: 0%;
+    transition: width ease-in-out .15s;
+}
+.progressDlDot::before,
+.progressDlDot::after {
+    transform: none !important;
+    --width: .2em;
+    content: "";
+    display: block;
+    height: 100%;
+    width: var(--width);
+    background: var(--primary-color);
+    top: 0;
+    position: absolute;
+}
+.progressDlDot::before {
+    left: calc(var(--width)*-1);
+    border-radius: var(--small-radius) 0 0 var(--small-radius);
+}
+.progressDlDot::after {
+    right: calc(var(--width)*-1);
+    border-radius: 0 var(--small-radius) var(--small-radius) 0;
+}
+
+.Playlists {
+    padding: 3.8em 1em 0;
+}
+.Playlists .small-divider {
+    transform: none !important;
+}
+.Playlists .btn-container button {
+    width: 11.1rem;
+}
+
+.customRes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: inherit;
+}

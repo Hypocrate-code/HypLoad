@@ -1,0 +1,49 @@
+{
+  "name": "hypload",
+  "version": "1.0.0",
+  "description": "HypLoad, a YouTube video and playlist downloader, ad free.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hypocrate-code/hypload_desktop.git"
+  },
+  "keywords": [
+    "download",
+    "youtube",
+    "video",
+    "playlist",
+    "downloader",
+    "HypLoad",
+    "free",
+    "desktop",
+    "software"
+  ],
+  "author": "Hypocrate",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hypocrate-code/hypload/issues"
+  },
+  "homepage": "https://github.com/hypocrate-code/hypload#readme",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.8.1",
+    "@electron-forge/maker-deb": "^7.8.1",
+    "@electron-forge/maker-rpm": "^7.8.1",
+    "@electron-forge/maker-squirrel": "^7.8.1",
+    "@electron-forge/maker-wix": "^7.8.1",
+    "@electron-forge/maker-zip": "^7.8.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
+    "@electron-forge/plugin-fuses": "^7.8.1",
+    "@electron/fuses": "^1.8.0",
+    "@types/electron": "^1.4.38",
+    "electron": "^35.0.3"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
+    "tree-kill": "^1.2.2"
+  }
+}

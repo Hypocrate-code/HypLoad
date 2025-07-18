@@ -1,0 +1,22 @@
+{
+  "fr": {
+    "video_label": "Entrez le lien de votre vidéo <b>YouTube</b>",
+    "error_playlist_link_for_video": "C'est un lien de playlist.\nEntrez le lien de votre playlist <b>YouTube</b>",
+    "playlist_label":"Entrez le lien de votre playlist <b>YouTube</b>",
+    "error_video_link_for_playlist": "C'est un lien de vidéo.\nEnter the link of your <b>YouTube</b> playlist",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue,\nVérifier le lien et votre connexion.",
+    "video_downloaded": "Video téléchargée.\nEntrez le lien de votre vidéo <b>YouTube</b>",
+    "playlist_downloaded": "Playlist téléchargée.\nEntrez le lien de votre playlist <b>YouTube</b>"
+  },
+  "en": {
+    "video_label": "Enter the link of your <b>YouTube</b> video",
+    "error_playlist_link_for_video": "That's a playlist link.\nEnter the link of your <b>YouTube</b> video",
+    "playlist_label": "Enter the link of your <b>YouTube</b> playlist",
+    "error_video_link_for_playlist": "That's a video link.\nEnter the link of your <b>YouTube</b> playlist",
+    "loading": "Loading...",
+    "error": "An error occured,\nCheck your link and your connexion.",
+    "video_downloaded": "Video downloaded.\nEnter the link of your <b>YouTube</b> video",
+    "playlist_downloaded": "Playlist downloaded.\nEnter the link of your <b>YouTube</b> playlist"
+  }
+}
