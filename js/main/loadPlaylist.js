@@ -23,7 +23,7 @@ const { spawn } = require('child_process');
 const path = require('node:path');
 const sharedState = require('./sharedState');
 
-const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked', 'bin','win','yt-dlp.exe') : path.join(__dirname, '..', '..', 'bin','win','yt-dlp.exe');
+const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp') : path.join(__dirname, '..', '..', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp');
 
 async function loadPlaylist(e, link) {
 

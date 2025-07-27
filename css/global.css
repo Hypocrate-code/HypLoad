@@ -297,6 +297,9 @@ b {
     width: max-content;
     height: max-content;
 }
+.macOS .btn-window {
+    display: none !important;
+}
 .btn-window button * {
     transition: none;
 }
@@ -712,6 +715,8 @@ section>p {
 
 .LoadedPlaylist > .btn-container {
     position: absolute;
+    min-width: 11em;
+    max-width: max-content;
     left: 50%;
     transform: translateX(-50%);
     bottom: .85em;

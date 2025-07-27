@@ -25,8 +25,9 @@ const sharedState = require('./sharedState');
 const { getOptions } = require('./utils_file');
 const { AVAILABLE_CUSTOM_RES } = require('./resolution');
 
-const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin','win','yt-dlp.exe') : path.join(__dirname, '..', '..', 'bin','win','yt-dlp.exe');
-const PATH_TO_FFMPEG = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked', 'bin','win','ffmpeg.exe') : path.join(__dirname, '..', '..', 'bin','win','ffmpeg.exe');
+
+const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp') : path.join(__dirname, '..', '..', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp');
+const PATH_TO_FFMPEG = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'ffmpeg.exe' : 'ffmpeg') : path.join(__dirname, '..', '..', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'ffmpeg.exe' : 'ffmpeg');
 
 async function download(e, listLinks) {
 

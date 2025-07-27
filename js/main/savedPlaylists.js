@@ -16,7 +16,7 @@
     // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-const { getJSONFile, saveJSONFile} = require("./utils_file");
+const { getJSONFile, saveJSONFile } = require("./utils_file");
 const { app } = require("electron");
 const path = require('node:path');
 const fs = require("fs");
@@ -29,6 +29,9 @@ async function setNewLink(e, link, title) {
     data[link] = title;
     saveJSONFile(PLAYLISTS_FILE_PATH, data);
 }
+
+console.log(app.getPath('userData'));
+
 
 async function getPlaylistLinks() {
     try {
