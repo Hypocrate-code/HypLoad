@@ -306,4 +306,6 @@ function launchDownloadPlaylist() {
     goTo('DownloadPlaylist', -1, callback);
 }
 
+window.hyploadAPI.onErrorXattr(() => {goTo("ErrorXattr", 1, null)});
+
 window.launchDownloadPlaylist = launchDownloadPlaylist;

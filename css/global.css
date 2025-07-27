@@ -509,7 +509,8 @@ section>p {
     padding: 0.3em .3em;
     border-radius: calc(var(--radius)/3) calc(var(--radius)/1.5) calc(var(--radius)/1.5) 0;
 }
-.switchMode {
+.switchMode,
+.ErrorXattr button {
     display: flex;
     gap: .3em;
     font-size: .7em;

@@ -34,7 +34,7 @@ if(require('electron-squirrel-startup')) return;
 let currentWin = null;
 
 const createWindow = () => {
-  const win = new BrowserWindow({
+  currentWin = new BrowserWindow({
     width: 404,
     minWidth: 390,
     height: 574,
@@ -45,37 +45,15 @@ const createWindow = () => {
     }
   });
   if (process.platform === "win32") {
-    win.titleBarOverlay = false;
-    win.titleBarStyle = "hidden";
+    currentWin.titleBarOverlay = false;
+    currentWin.titleBarStyle = "hidden";
   }
-  // win.webContents.openDevTools();
-  win.setMenuBarVisibility(false);
+  // currentWin.webContents.openDevTools();
+  currentWin.setMenuBarVisibility(false);
   
   getOptions().then(options => {
-    win.loadFile(`html/index_${options.lang}.html`);
+    currentWin.loadFile(`html/index_${options.lang}.html`);
   })
-
-  return win;
-}
-
-app.whenReady().then(() => {
-  
-  // Gestion des fonctions IPC 
-  ipcMain.handle('get-options', getOptions);
-  ipcMain.handle('get-text', getText);
-  ipcMain.handle('is-already-downloaded', isAlreadyDownloaded);
-  ipcMain.handle('download', download);
-  ipcMain.handle('load-playlist', loadPlaylist);
-  ipcMain.handle('switch-color-mode', switchColorMode);
-  ipcMain.handle('switch-mode', switchMode);
-  ipcMain.handle('set-new-link', setNewLink);
-  ipcMain.handle('get-playlist-links', getPlaylistLinks);
-  ipcMain.on('change-resolution', changeResolution);
-  ipcMain.on('stop-current-cmd', stopCmd);
-  ipcMain.on('open', (e, link) => shell.openExternal(link));
-  
-  currentWin = createWindow();
-
   if (process.platform === "darwin") {
     
     const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp') : path.join(__dirname, 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp');
@@ -115,7 +93,14 @@ app.whenReady().then(() => {
     xattr_yt_dlp.stderr.on('data', (data) => {
       console.log(`stderr xattr ytlp: ${data.toString()}`);
       if (!data.toString().includes('No such xattr: com.apple.quarantine')) {
-        app.quit();
+        if (currentWin) {
+          currentWin.webContents.on('did-finish-load', () => {
+            currentWin.webContents.send("errorXattr");
+          });
+        }
+        else {
+          console.log("CurrentWin doesn't exist.");
+        }
       }
     });
 
@@ -127,7 +112,14 @@ app.whenReady().then(() => {
     xattr_ffmpeg.stderr.on('data', (data) => {
       console.log(`stderr xattr ffmpeg: ${data.toString()}`);
       if (!data.toString().includes('No such xattr: com.apple.quarantine')) {
-        app.quit();
+        if (currentWin) {
+          currentWin.webContents.on('did-finish-load', () => {
+            currentWin.webContents.send("errorXattr");
+          });
+        }
+        else {
+          console.log("CurrentWin doesn't exist.");
+        }
       }
     });
 
@@ -135,6 +127,25 @@ app.whenReady().then(() => {
       console.log(`Process xattr ffmpeg exited with code ${code}`);
     });
   }
+}
+
+app.whenReady().then(() => {
+  
+  // Gestion des fonctions IPC 
+  ipcMain.handle('get-options', getOptions);
+  ipcMain.handle('get-text', getText);
+  ipcMain.handle('is-already-downloaded', isAlreadyDownloaded);
+  ipcMain.handle('download', download);
+  ipcMain.handle('load-playlist', loadPlaylist);
+  ipcMain.handle('switch-color-mode', switchColorMode);
+  ipcMain.handle('switch-mode', switchMode);
+  ipcMain.handle('set-new-link', setNewLink);
+  ipcMain.handle('get-playlist-links', getPlaylistLinks);
+  ipcMain.on('change-resolution', changeResolution);
+  ipcMain.on('stop-current-cmd', stopCmd);
+  ipcMain.on('open', (e, link) => shell.openExternal(link));
+  
+  createWindow();
   
   ipcMain.on('minimize', () => currentWin.minimize())
   ipcMain.on('maximize', () => currentWin.isMaximized() ? currentWin.unmaximize() : currentWin.maximize())
