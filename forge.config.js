@@ -32,10 +32,10 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        // loadingGif: "",
+        loadingGif: "./assets/loading.gif",
         appDirectory: "./",
         exe: "HypLoad.exe",
-        // iconUrl: 'https://github.com/Hypocrate-code/HypLoad/tree/main/assets/icon.ico',
+        iconUrl: 'https://github.com/Hypocrate-code/HypLoad/blob/master/assets/icon.ico?raw=true',
         setupIcon: './assets/icon.ico',
         noMsi: false
       },
