@@ -21,7 +21,7 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
 module.exports = {
   packagerConfig: {
-    icon: "/assets/icon.ico",
+    icon: "./assets/icon.icns",
     name: "HypLoad",
     asar: {
       unpack: "**/bin/**"
@@ -31,6 +31,7 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
+      platforms: ['win32'],
       config: {
         loadingGif: "./assets/loading.gif",
         appDirectory: "./",
@@ -40,10 +41,10 @@ module.exports = {
         noMsi: false
       },
     },
-    {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin', 'linux'],
-    },
+    // {
+    //   name: '@electron-forge/maker-zip',
+    //   platforms: ['darwin'],
+    // },
     {
       name: '@electron-forge/maker-deb',
       config: {
@@ -51,6 +52,15 @@ module.exports = {
             icon: '/assets/icon.png'
         }
       },
+    },
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+      config: {
+        // background: './assets/icon.png',
+        icon: "./assets/icon.icns",
+        format: 'ULFO'
+      }
     },
     {
       name: '@electron-forge/maker-rpm',

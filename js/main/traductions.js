@@ -42,7 +42,7 @@ async function changeLanguage(lang) {
 async function getText(e, key) {
     const options = await getOptions();
     const data = getJSONFile(TEXT_FILE_PATH)        
-    // console.log(data[options.lang][key]);
+    // log.inf(data[options.lang][key]);
     return data[options.lang][key];
 }
 

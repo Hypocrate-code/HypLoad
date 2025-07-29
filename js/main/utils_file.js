@@ -21,8 +21,8 @@ const path = require('node:path');
 const fs = require("fs");
 const { app } = require("electron");
 
-const OPTIONS_FILE_PATH = path.join(app.getPath('userData'), "/config.json");
-const OPTIONS_DEFAULT_FILE_PATH = path.join(__dirname, "../../config-default.json");
+const OPTIONS_FILE_PATH = path.join(app.getPath('userData'), "config.json");
+const OPTIONS_DEFAULT_FILE_PATH = path.join(__dirname, "..", "..", "config-default.json");
 
 function getJSONFile(file) {
   try {
@@ -52,6 +52,7 @@ async function getOptions (e) {
       optionsFile = await getJSONFile(OPTIONS_FILE_PATH);
     }
     else {
+      console.log("Get (fichier existe askip) config.json");
       optionsFile = await getJSONFile(OPTIONS_FILE_PATH);
     }
     if (optionsFile) {

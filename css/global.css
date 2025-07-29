@@ -297,6 +297,9 @@ b {
     width: max-content;
     height: max-content;
 }
+.macOS .btn-window {
+    display: none !important;
+}
 .btn-window button * {
     transition: none;
 }
@@ -506,7 +509,8 @@ section>p {
     padding: 0.3em .3em;
     border-radius: calc(var(--radius)/3) calc(var(--radius)/1.5) calc(var(--radius)/1.5) 0;
 }
-.switchMode {
+.switchMode,
+.ErrorXattr button {
     display: flex;
     gap: .3em;
     font-size: .7em;
@@ -712,6 +716,8 @@ section>p {
 
 .LoadedPlaylist > .btn-container {
     position: absolute;
+    min-width: 11em;
+    max-width: max-content;
     left: 50%;
     transform: translateX(-50%);
     bottom: .85em;

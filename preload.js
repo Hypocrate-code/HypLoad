@@ -24,6 +24,8 @@ contextBridge.exposeInMainWorld('hyploadAPI', {
   maximize: () => ipcRenderer.send('maximize'),
   close: () => ipcRenderer.send('close'),
 
+  onErrorXattr: (goToErrorXattr) => ipcRenderer.on('errorXattr', () => goToErrorXattr()),
+
   open : (link) => ipcRenderer.send("open", link),
 
   getOptions: () => ipcRenderer.invoke('get-options'),

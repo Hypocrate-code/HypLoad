@@ -32,7 +32,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         setResolution(options);
         setPlaylists();
     }).catch(err => console.log(err));
-    const body = document.querySelector('body')
+    const body = document.querySelector('body');
+    if (navigator.platform === "MacIntel") {
+        body.classList.add("macOS");
+    }
     setTimeout(()=>body.classList.remove('isLoading'), 777)
 })
 
@@ -302,5 +305,7 @@ function launchDownloadPlaylist() {
     }
     goTo('DownloadPlaylist', -1, callback);
 }
+
+window.hyploadAPI.onErrorXattr(() => {goTo("ErrorXattr", 1, null)});
 
 window.launchDownloadPlaylist = launchDownloadPlaylist;
