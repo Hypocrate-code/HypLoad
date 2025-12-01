@@ -2,5 +2,6 @@
   "color_mode": "light",
   "only_audio": true,
   "video_res": "bv",
-  "lang": "en"
+  "lang": "en",
+  "audio_format": "mp3"
 }

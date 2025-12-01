@@ -19,11 +19,22 @@
 // main process module
 
 const { app } = require('electron');
-const { spawn } = require('child_process');
 const path = require('node:path');
 const sharedState = require('./sharedState');
+const { exec, spawn } = require('node:child_process');
+const iconv = require('iconv-lite');
 
 const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp') : path.join(__dirname, '..', '..', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp');
+
+
+function chunkArray(array, size = 5) {
+  const result = [];
+  for (let i = 0; i < array.length; i += size) {
+    result.push(array.slice(i, i + size));
+  }
+  return result;
+}
+
 
 async function loadPlaylist(e, link) {
 
@@ -35,26 +46,39 @@ async function loadPlaylist(e, link) {
         webContents.send('update-progress-bar', "Error", "Pas un lien de playlist.");
         return;
     }
-    webContents.send('update-progress-bar', "Start");
-    const cmd = spawn(PATH_TO_YT_DLP, ['--skip-download', '--flat-playlist', '--print', "%(title)s | %(uploader)s | %(webpage_url)s | https://i.ytimg.com/vi/%(id)s/sddefault.jpg | %(view_count)s | %(playlist)s | %(playlist_id)s | %(playlist_index)s | %(playlist_count)s" , link]); // Remplace par ta commande
-    sharedState.currentProcess = cmd.pid;
-    // const cmd = spawn(path.join(__dirname, '../bin/win/yt-dlp.exe'), [link]); // Remplace par ta commande
+    if (link.includes("&si")) {
+        link = link.substring(0, link.indexOf("&si"));
+    }
 
+    webContents.send('update-progress-bar', "Start");
+    const cmd = exec(`${PATH_TO_YT_DLP} --skip-download --flat-playlist --print "%(title)s | %(uploader)s | %(webpage_url)s | https://i.ytimg.com/vi/%(id)s/sddefault.jpg | %(view_count)s | %(playlist)s | %(playlist_id)s | %(playlist_index)s | %(playlist_count)s | " "${link}"`,
+        {
+            encoding: 'buffer'
+        }
+    );
+    sharedState.currentProcess = cmd.pid;
+    
     cmd.stdout.on('data', (data) => {
-        const baseString = data.toString();
-        // console.log(baseString);
+        const baseString = iconv.decode(data, 'windows1252').replaceAll(" | \n", " | ");
         const newData = baseString.split(' | ');
-        const index = parseInt(newData[newData.length - 2]);
-        const total = parseInt(newData[newData.length - 1]);
-        title = newData[5];
-        playlist_id = newData[6];
-        webContents.send('update-progress-bar', ((index/total) * 100).toFixed(0));
-        webContents.send('video-data-transmitter', newData);
+        newData.pop();
+        console.log("new d : ", newData);
+        const chuckOfData = chunkArray(newData, size=9)
+        chuckOfData.forEach(el => {
+            console.log("un el : ", el);
+            const index = parseInt(el.length - 2);
+            const total = parseInt(el.length - 1);
+            title = el[5];
+            playlist_id = el[6];
+            webContents.send('update-progress-bar', ((index/total) * 100).toFixed(0));
+            webContents.send('video-data-transmitter', el);
+        });
     });
 
     
     cmd.stderr.on('data', (data) => {
         process.stderr.write(`stderr: ${data}`);
+        if (data.includes("WARNING")) return;
         webContents.send('update-progress-bar', "Error", data.toString());
     });
 

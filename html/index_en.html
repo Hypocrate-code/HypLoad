@@ -48,6 +48,10 @@
             </svg>
         </button>
     </div>
+    <section class="ErrorConn">
+        <p><b>HypLoad</b> needs an internet connexion.</p>
+        <button onclick="hyploadAPI.close()">Close HypLoad</button>
+    </section>
     <section class="ErrorXattr">
         <p><b>HypLoad</b> needs to be placed in the /Applications folder.</p>
         <button onclick="hyploadAPI.close()">Close HypLoad</button>
@@ -58,7 +62,7 @@
         <div class="btn-container">
             <button onclick="goTo('DownloadSingle', 1, null)">Download a video</button>
             <button onclick="goTo('DownloadPlaylist', 1, null)">Download a playlist</button>
-            <button onclick="goTo('Playlists', 1, null)">My playlists saved</button>
+            <button onclick="goTo('Playlists', 1, null)">My saved playlists</button>
             <button onclick="goTo('Options', 1, null)">Options and infos</button>
         </div>
         <p id="author">developed by Hypocrate</p>
@@ -165,10 +169,20 @@
         </button>
         <div class="btn-container">
             <button id="colorMode" onclick="switchColorMode()">Dark mode</button>
-            <button onclick="goTo('ChangeResolution', 1, null)">Video resolution</button>
+            <button onclick="goTo('DownloadSettings', 1, null)">Download settings</button>
             <button onclick="goTo('ChangeLanguage', 1, null)">Change the language</button>
             <button onclick="hyploadAPI.open('https:\/\/Hypocrate-code.github.io/Hypload_desktop')">How to use HypLoad ?</button>
             <button onclick="hyploadAPI.open('https:\/\/hypocrate.dev')">Who is Hypocrate ?</button>
+        </div>
+    </section>
+
+    <section class="DownloadSettings">
+        <button class="returnBtn" onclick="goTo('Options', -1, null)">
+            <div class="arrow"></div>
+        </button>
+        <div class="btn-container">
+            <button onclick="goTo('ChangeResolution', 1, null)">Video resolution</button>
+            <button onclick="goTo('ChangeFormat', 1, null)">Audio format</button>
         </div>
     </section>
 
@@ -183,14 +197,14 @@
     </section>
 
     <section class="ChangeResolution">
-        <button class="returnBtn" onclick="goTo('Options', -1, null)">
+        <button class="returnBtn" onclick="goTo('DownloadSettings', -1, null)">
             <div class="arrow"></div>
         </button>
         <p>Resolution of the<br/>downloaded videos.</p>
         <div class="small-divider"></div>
         <div class="btn-container">
             <button res='bv' onclick="changeResolution('bv')">Highest available</button>
-            <div class="customRes">
+            <div class="customContainer">
                 <button res='1080' onclick="changeResolution('1080')">1080p</button>
                 <button res='720' onclick="changeResolution('720')">720p</button>
                 <button res='480' onclick="changeResolution('480')">480p</button>
@@ -199,6 +213,20 @@
                 <button res='144' onclick="changeResolution('144')">144p</button>
             </div>
             <button res='wv' onclick="changeResolution('wv')">Lowest available</button>
+        </div>
+    </section>
+
+    <section class="ChangeFormat">
+        <button class="returnBtn" onclick="goTo('DownloadSettings', -1, null)">
+            <div class="arrow"></div>
+        </button>
+        <p>Format of the<br/>downloaded audios.</p>
+        <div class="small-divider"></div>
+        <div class="btn-container">
+            <div class="customContainer">
+                <button format='mp3' onclick="changeAudioFormat('mp3')">.mp3</button>
+                <button format='wav' onclick="changeAudioFormat('wav')">.wav</button>
+            </div>
         </div>
     </section>
 

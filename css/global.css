@@ -420,31 +420,26 @@ button:hover>svg * {
     position: relative;
 }
 
-.btn-container button::after,
-.btn-container button::before {
+.btn-container button::after {
+    --width: .6em;
     content: '';
     display: block;
-    width: .7em;
-    height: var(--trait-width);
-    background: var(--background-of-the-app);
+    width: var(--width);
+    height: calc(var(--width) * 7 / 4);
     position: absolute;
     right: 1em;
-    transform-origin: right;
     opacity: 0;
+    background-color: var(--background-of-the-app);
+    mask: url("../assets/arrow.svg") no-repeat center / contain;
+    -webkit-mask: url("../assets/arrow.svg") no-repeat center / contain;
+    top: 50%;
+    transform-origin: right;
     transition: transform var(--bouncy-bezier) .25s .1s, opacity ease-in-out .1s .1s;
-    border-radius: 1em;
+    transform: translateX(-.7em) translateY(-44%);
 }
-.btn-container button::after {
-    top: calc(50% - var(--trait-width)/2);
-    rotate: 40deg;
-    transform: translateX(calc( cos(-40deg) * -.7em)) translateY(calc( sin(-40deg) * -.7em));
-}
-.btn-container button::before {
-    bottom: calc(50% - var(--trait-width)/2);
-    rotate: -40deg;
-    transform: translateX(calc( cos(40deg) * -.7em)) translateY(calc( sin(40deg) * -.7em));
-}
+
 .activeResolution,
+.activeFormat,
 button:hover,
 button:focus-visible {
     background: var(--primary-color);
@@ -457,12 +452,11 @@ button:focus-visible {
 .btn-container button:hover::before,
 .btn-container button:focus-visible::after,
 .btn-container button:focus-visible::before {
-    transform: none;
+    transform: translateX(0) translateY(-44%);
     opacity: 1;
 }
 
 section>p {
-    /* max-width: 15em; */
     text-align: center;
     white-space: pre-wrap;
     line-height: 138%;
@@ -510,6 +504,7 @@ section>p {
     border-radius: calc(var(--radius)/3) calc(var(--radius)/1.5) calc(var(--radius)/1.5) 0;
 }
 .switchMode,
+.ErrorConn button,
 .ErrorXattr button {
     display: flex;
     gap: .3em;
@@ -565,6 +560,7 @@ section>p {
     font-size: .77em;
 }
 .ChangeResolution > .small-divider,
+.ChangeFormat > .small-divider,
 .LoadedPlaylist > .small-divider {
     /* margin-block: .5em; */
     transform: translateY(-100%) !important;
@@ -580,7 +576,7 @@ section>p {
 .scrollContainer .btn-container p {
     letter-spacing: -0.05em;
 }
-.scrollContainer::after {
+.LoadedPlaylist .scrollContainer::after {
     content: "";
     display: block;
     position: absolute;
@@ -591,7 +587,7 @@ section>p {
     width: 20rem;
     /* background: transparent; */
     background: radial-gradient(ellipse at bottom center, var(--light-primary-color) 0%, transparent 71%);
-    opacity: 0.25;
+    opacity: 0.35;
 }
 
 .scrollContainer::-webkit-scrollbar {
@@ -770,13 +766,14 @@ section>p {
 .Playlists .small-divider {
     transform: none !important;
 }
+
 .Playlists .btn-container button {
     width: 11.1rem;
 }
 
-.customRes {
+.customContainer {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
+    /* grid-template-rows: 1fr 1fr 1fr; */
     gap: inherit;
 }

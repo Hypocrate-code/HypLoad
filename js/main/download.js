@@ -22,23 +22,28 @@ const { spawn } = require('child_process');
 const { app } = require("electron");
 const path = require('node:path');
 const sharedState = require('./sharedState');
-const { getOptions } = require('./utils_file');
+const { getOptions, sanitizeFolderName } = require('./utils_file');
 const { AVAILABLE_CUSTOM_RES } = require('./resolution');
 
 
 const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp') : path.join(__dirname, '..', '..', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp');
 const PATH_TO_FFMPEG = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'ffmpeg.exe' : 'ffmpeg') : path.join(__dirname, '..', '..', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'ffmpeg.exe' : 'ffmpeg');
 
-async function download(e, listLinks) {
-
-    // console.log(listLinks);
+async function download(e, listLinks, folder) {
     
+
     if (!listLinks || listLinks.length == 0) {
         return;
     }
     const webContents = e.sender;
 
     const [link, onlyAudio] = listLinks[0];
+
+    console.log(link);
+    console.log(onlyAudio);
+    console.log(folder);
+    
+
     console.log("Téléchargement lancé pour : ", link);
 
     webContents.send('update-progress-bar', "Start");
@@ -46,14 +51,15 @@ async function download(e, listLinks) {
     const options = await getOptions();
     const videoParameters = AVAILABLE_CUSTOM_RES.includes(options.video_res) ? ["-t", "mp4","-S", `res:${options.video_res}`] : ["-t", "mp4",'-f', `${options.video_res}*+ba/b`];
 
-    const path_to_download = path.join(onlyAudio ? app.getPath('music') : app.getPath('videos'),'HypLoad', '%(title)s.%(ext)s');
+    const path_to_download = path.join(onlyAudio ? app.getPath('music') : app.getPath('videos'),'HypLoad', sanitizeFolderName(folder), '%(title)s.%(ext)s');
     
     console.log(path_to_download);
     console.log(PATH_TO_FFMPEG);
     console.log(PATH_TO_YT_DLP);
 
-    const audioParameters = ['-x', "-f", "ba" , '-t', 'mp3'];
+    const audioParameters = ['-x',"--audio-format", options.audio_format , "-f", "ba"];
     const generalParameters = ["--embed-thumbnail", "--embed-metadata", '--no-playlist' ,"-o", path_to_download , '--ffmpeg-location', PATH_TO_FFMPEG, link]
+    options.audio_format === "wav" && generalParameters.shift();
     const finalParameters = onlyAudio ? [...audioParameters, ...generalParameters] : [...videoParameters, ...generalParameters];
     // console.log(finalParameters);
     
@@ -78,6 +84,7 @@ async function download(e, listLinks) {
 
     cmd.stderr.on('data', (data) => {
         process.stderr.write(`stderr: ${data}`);
+        if (data.includes("WARNING")) return;
         webContents.send('update-progress-bar', "Error", data.toString());
     });
     

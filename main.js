@@ -25,13 +25,15 @@ const { switchColorMode } = require("./js/main/colorMode");
 const { switchMode } = require("./js/main/audioOrVideo");
 const { changeLanguage, getText } = require('./js/main/traductions');
 const { changeResolution } = require('./js/main/resolution');
+const { changeAudioFormat } = require('./js/main/audioFormat')
 const { setNewLink, getPlaylistLinks } = require('./js/main/savedPlaylists');
 const { spawn } = require('child_process');
-// require('./log');
+const { updateYTDLP } = require("./js/main/update");
 
 if(require('electron-squirrel-startup')) return;
 
 let currentWin = null;
+
 
 const createWindow = () => {
   currentWin = new BrowserWindow({
@@ -39,24 +41,26 @@ const createWindow = () => {
     minWidth: 390,
     height: 574,
     minHeight: 550,
+    titleBarStyle: process.platform === "win32" ? "hidden" : "default",
+    titleBarOverlay: process.platform === "win32" ? false : undefined,
     icon: "assets/icon.png",
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   });
-  if (process.platform === "win32") {
-    currentWin.titleBarOverlay = false;
-    currentWin.titleBarStyle = "hidden";
-  }
   // currentWin.webContents.openDevTools();
   currentWin.setMenuBarVisibility(false);
   
   getOptions().then(options => {
     currentWin.loadFile(`html/index_${options.lang}.html`);
   })
+
+  const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp') : path.join(__dirname, 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp');
+
+  updateYTDLP(PATH_TO_YT_DLP, currentWin);
+
   if (process.platform === "darwin") {
     
-    const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp') : path.join(__dirname, 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp');
     const PATH_TO_FFMPEG = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'ffmpeg.exe' : 'ffmpeg') : path.join(__dirname, 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'ffmpeg.exe' : 'ffmpeg');
     
     saveJSONFile(path.join(app.getPath('userData'), "c.json"), { yt: PATH_TO_YT_DLP, ff: PATH_TO_FFMPEG })
@@ -142,6 +146,7 @@ app.whenReady().then(() => {
   ipcMain.handle('set-new-link', setNewLink);
   ipcMain.handle('get-playlist-links', getPlaylistLinks);
   ipcMain.on('change-resolution', changeResolution);
+  ipcMain.on('change-audio-format', changeAudioFormat);
   ipcMain.on('stop-current-cmd', stopCmd);
   ipcMain.on('open', (e, link) => shell.openExternal(link));
   

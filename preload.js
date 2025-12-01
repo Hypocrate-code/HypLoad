@@ -25,13 +25,14 @@ contextBridge.exposeInMainWorld('hyploadAPI', {
   close: () => ipcRenderer.send('close'),
 
   onErrorXattr: (goToErrorXattr) => ipcRenderer.on('errorXattr', () => goToErrorXattr()),
+  onErrorConn: (goToErrorConn) => ipcRenderer.on('errorConn', () => goToErrorConn()),
 
   open : (link) => ipcRenderer.send("open", link),
 
   getOptions: () => ipcRenderer.invoke('get-options'),
   getText: (key, lang) => ipcRenderer.invoke('get-text', key, lang),
 
-  isAlreadyDownloaded: (title, only_audio) => ipcRenderer.invoke('is-already-downloaded', title, only_audio),
+  isAlreadyDownloaded: (title, only_audio, format, playlistName) => ipcRenderer.invoke('is-already-downloaded', title, only_audio, format, playlistName),
 
   switchColorMode: () => ipcRenderer.invoke("switch-color-mode"),
   switchMode: () => ipcRenderer.invoke("switch-mode"),
@@ -41,8 +42,9 @@ contextBridge.exposeInMainWorld('hyploadAPI', {
   
   changeLanguage: (lang) => ipcRenderer.invoke("change-language", lang),
   changeResolution: (res) => ipcRenderer.send("change-resolution", res),
+  changeAudioFormat: (format) => ipcRenderer.send("change-audio-format", format),
 
-  download: (listLinks) => ipcRenderer.invoke('download', listLinks),
+  download: (listLinks, folder) => ipcRenderer.invoke('download', listLinks, folder),
   loadPlaylist: (link) => ipcRenderer.invoke('load-playlist', link),
 
   stopCmd: () => ipcRenderer.send("stop-current-cmd"),

@@ -52,7 +52,7 @@ async function getOptions (e) {
       optionsFile = await getJSONFile(OPTIONS_FILE_PATH);
     }
     else {
-      console.log("Get (fichier existe askip) config.json");
+      console.log("Get config.json, file exists");
       optionsFile = await getJSONFile(OPTIONS_FILE_PATH);
     }
     if (optionsFile) {
@@ -71,8 +71,8 @@ function setOptions (options) {
   saveJSONFile(OPTIONS_FILE_PATH, options);
 }
 
-async function isAlreadyDownloaded(e, title, onlyAudio) {
-  const isPath = path.join(onlyAudio ? app.getPath('music') : app.getPath('videos'),'HypLoad', `${title}.${onlyAudio ? "mp3" : "mp4"}`);;
+async function isAlreadyDownloaded(e, title, onlyAudio, format, playlistName) {
+  const isPath = path.join(onlyAudio ? app.getPath('music') : app.getPath('videos'),'HypLoad', sanitizeFolderName(playlistName),`${title}.${format}`);;
   return new Promise((resolve) => {
     fs.access(isPath, fs.constants.F_OK, (err) => {
       if (err) {
@@ -86,4 +86,22 @@ async function isAlreadyDownloaded(e, title, onlyAudio) {
   })
 }
 
-module.exports = { getOptions, setOptions, isAlreadyDownloaded, getJSONFile, saveJSONFile };
+
+function sanitizeFolderName(name) {
+  console.log('name', name);
+  const forbidden = /[<>:"/\\|?*\x00-\x1F]/g;
+  const reserved = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
+  let cleaned = name.replace(forbidden, "_").trim();
+  cleaned = cleaned.replace(/[ .]+$/g, "");
+  if (reserved.test(cleaned)) {
+    cleaned += "_playlist";
+  }
+  if (!cleaned.length) {
+    cleaned = "playlist";
+  }
+  return cleaned;
+}
+
+
+
+module.exports = { getOptions, setOptions, isAlreadyDownloaded, getJSONFile, saveJSONFile, sanitizeFolderName };

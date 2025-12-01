@@ -21,7 +21,7 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
 module.exports = {
   packagerConfig: {
-    icon: "./assets/icon.icns",
+    icon: "./assets/icon.ico",
     name: "HypLoad",
     asar: {
       unpack: "**/bin/**"
@@ -36,7 +36,7 @@ module.exports = {
         loadingGif: "./assets/loading.gif",
         appDirectory: "./",
         exe: "HypLoad.exe",
-        iconUrl: 'https://github.com/Hypocrate-code/HypLoad/blob/master/assets/icon.ico?raw=true',
+        iconUrl: 'https://github.com/Hypocrate-code/HypLoad/blob/main/assets/icon.ico?raw=true',
         setupIcon: './assets/icon.ico',
         noMsi: false
       },
@@ -45,27 +45,27 @@ module.exports = {
     //   name: '@electron-forge/maker-zip',
     //   platforms: ['darwin'],
     // },
-    {
-      name: '@electron-forge/maker-deb',
-      config: {
-        options: {
-            icon: '/assets/icon.png'
-        }
-      },
-    },
-    {
-      name: '@electron-forge/maker-dmg',
-      platforms: ['darwin'],
-      config: {
-        // background: './assets/icon.png',
-        icon: "./assets/icon.icns",
-        format: 'ULFO'
-      }
-    },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
-    },
+    // {
+    //   name: '@electron-forge/maker-deb',
+    //   config: {
+    //     options: {
+    //         icon: '/assets/icon.png'
+    //     }
+    //   },
+    // },
+    // {
+    //   name: '@electron-forge/maker-dmg',
+    //   platforms: ['darwin'],
+    //   config: {
+    //     // background: './assets/icon.png',
+    //     icon: "./assets/icon.icns",
+    //     format: 'ULFO'
+    //   }
+    // },
+    // {
+    //   name: '@electron-forge/maker-rpm',
+    //   config: {},
+    // },
     // {
     //   name: '@electron-forge/maker-wix',
     //   platforms: ['win32'],

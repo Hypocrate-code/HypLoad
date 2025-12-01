@@ -21,7 +21,11 @@ import { setProgressBarValue } from "./js/renderer/progressBarUI.js";
 import { setColorMode, switchColorMode } from "./js/renderer/colorMode.js";
 import { setMusicOrVideoBtns, switchMode } from "./js/renderer/audioOrVideo.js";
 import { setResolution, changeResolution} from "./js/renderer/resolution.js";
+import { changeAudioFormat, setAudioFormat } from "./js/renderer/audioFormat.js";
 import { setPlaylists } from "./js/renderer/savedPlaylists.js";
+
+const playlistScreen = document.querySelector(".LoadedPlaylist");
+const titleOfPlaylist = playlistScreen.querySelector('p');
 
 window.addEventListener('DOMContentLoaded', async () => {
     // Initial setup of options
@@ -30,6 +34,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         setColorMode(options);
         setMusicOrVideoBtns(options);
         setResolution(options);
+        setAudioFormat(options);
         setPlaylists();
     }).catch(err => console.log(err));
     const body = document.querySelector('body');
@@ -42,6 +47,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 window.switchColorMode = switchColorMode;
 window.switchMode = switchMode;
 window.changeResolution = changeResolution;
+window.changeAudioFormat = changeAudioFormat;
 
 async function goTo(sectionName, direction, callback) {
     const newSection = document.querySelector("."+sectionName);
@@ -95,7 +101,7 @@ async function launchDownloadSingle() {
             resetInputValue(actualSection);
         }
         else {
-            window.hyploadAPI.getOptions().then(options=> window.hyploadAPI.download([[link, options.only_audio]]))
+            window.hyploadAPI.getOptions().then(options=> window.hyploadAPI.download([[link, options.only_audio]], ''))
         }
     } catch (error) {
         console.log(error);
@@ -207,16 +213,14 @@ const videoSvg = `
 window.hyploadAPI.onNewVideoData((videoData) => {
     try {
         window.hyploadAPI.getOptions().then(async (options) => {
-            const playlistScreen = document.querySelector(".LoadedPlaylist");
             const videoContainer = playlistScreen.querySelector('.videoContainer');
             if (!videoContainer) {
                 throw new Error("Pas de video container, bizarre.");
             }
             
             const newVideo = document.createElement('div');
-            const titleOfPlaylistEl = playlistScreen.querySelector('p');
-            if(titleOfPlaylistEl) {
-                titleOfPlaylistEl.innerHTML = `<b>HypLoad</b><br/>${videoData[5]}`;
+            if(titleOfPlaylist) {
+                titleOfPlaylist.innerHTML = `<b>HypLoad</b><br/>${videoData[5]}`;
             };
 
             newVideo.classList.add("video");
@@ -238,7 +242,7 @@ window.hyploadAPI.onNewVideoData((videoData) => {
                     <path d="M7.82886 35.1963C13.9473 40.6011 18.7778 45.81 24.3289 55.5C39.2331 35.7735 50.3586 22.3728 70.3289 7.69629" stroke="#E5211E" stroke-width="14" stroke-linecap="round"/>
                 </svg>
             `
-            const isAlready = await window.hyploadAPI.isAlreadyDownloaded(videoData[0], options.only_audio)
+            const isAlready = await window.hyploadAPI.isAlreadyDownloaded(videoData[0], options.only_audio, options.only_audio ? options.audio_format : "mp4", videoData[5]);
             // console.log("isAlready");
             // console.log(isAlready);
             isAlready && newVideo.classList.add("notDownloadable");
@@ -301,11 +305,12 @@ function launchDownloadPlaylist() {
     // console.log(linksToDownload);
     const callback = (section) => {
         resetSection(section);
-        window.hyploadAPI.download(linksToDownload);
+        window.hyploadAPI.download(linksToDownload, titleOfPlaylist.textContent.replace("HypLoad", ""));
     }
     goTo('DownloadPlaylist', -1, callback);
 }
 
 window.hyploadAPI.onErrorXattr(() => {goTo("ErrorXattr", 1, null)});
+window.hyploadAPI.onErrorConn(() => {goTo("ErrorConn", 1, null)});
 
 window.launchDownloadPlaylist = launchDownloadPlaylist;
