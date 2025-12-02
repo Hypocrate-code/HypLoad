@@ -50,7 +50,7 @@ async function loadPlaylist(e, link) {
         link = link.substring(0, link.indexOf("&si"));
     }
 
-    webContents.send('update-progress-bar', "Start");
+    webContents.send('update-progress-bar', "Start", null);
     const cmd = exec(`${PATH_TO_YT_DLP} --skip-download --flat-playlist --print "%(title)s | %(uploader)s | %(webpage_url)s | https://i.ytimg.com/vi/%(id)s/sddefault.jpg | %(view_count)s | %(playlist)s | %(playlist_id)s | %(playlist_index)s | %(playlist_count)s | " "${link}"`,
         {
             encoding: 'buffer'

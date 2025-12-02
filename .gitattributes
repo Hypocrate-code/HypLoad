@@ -1,0 +1,2 @@
+*.exe filter=lfs diff=lfs merge=lfs -text
+out/make/squirrel.windows/x64/HypLoad-1.0.0[[:space:]]Setup.exe filter=lfs diff=lfs merge=lfs -text

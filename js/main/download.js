@@ -42,11 +42,10 @@ async function download(e, listLinks, folder) {
     console.log(link);
     console.log(onlyAudio);
     console.log(folder);
-    
 
     console.log("Téléchargement lancé pour : ", link);
 
-    webContents.send('update-progress-bar', "Start");
+    webContents.send('update-progress-bar', "Start", listLinks.length !== 0 ? listLinks.length : null);
 
     const options = await getOptions();
     const videoParameters = AVAILABLE_CUSTOM_RES.includes(options.video_res) ? ["-t", "mp4","-S", `res:${options.video_res}`] : ["-t", "mp4",'-f', `${options.video_res}*+ba/b`];
@@ -93,7 +92,7 @@ async function download(e, listLinks, folder) {
         sharedState.currentProcess = null;
         if (code !== 1) {
             listLinks.shift();
-            listLinks.length === 0 ? webContents.send('update-progress-bar', "End") : download(e, listLinks);
+            listLinks.length === 0 ? webContents.send('update-progress-bar', "End") : download(e, listLinks, folder);
         }
     });
     return "go !";

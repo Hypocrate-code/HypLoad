@@ -144,7 +144,11 @@ window.hyploadAPI.onProgressUpdate(async (value, content) => {
     switch (value) {
         case "Start":
             setProgressBarValue(0);
-            setP(await hyploadAPI.getText("loading"), section);
+            let textLoading = await hyploadAPI.getText("loading");
+            if (content !== undefined && content !== null) {
+                textLoading = `${textLoading.replace('...', ' :')} ${content} ${await hyploadAPI.getText("remaining")}`;
+            } 
+            setP(textLoading, section);
             setGateState("loading", section);
             break;
         case "Error":
