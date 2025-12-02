@@ -34,10 +34,9 @@ Acts as a clean GUI for [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
 ### <a id="en-win">Windows</a>
 
-1. Download the <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.1.0.0/windows" target="blank">.zip</a> folder of the latest release.
-2. Unzip the folder.
-3. Execute the <u>Hypload-Setup.exe</u> file.
-4. Use HypLoad !
+1. Download the <a href="https://github.com/Hypocrate-code/HypLoad/raw/refs/heads/main/out/make/squirrel.windows/x64/HypLoad-1.0.0%20Setup.exe?download=">HypLoad-Setup.exe</a> file of the pre-release.
+2. Execute <u>HypLoad-Setup.exe</u> and accept permissions.
+3. Use HypLoad !
 
 Downloads will be available in [these folders](#en-folders).
 
@@ -205,10 +204,9 @@ Sert d'interface pour [yt-dlp](https://github.com/yt-dlp/yt-dlp) (inclus).
 
 ### <a id="fr-win">Windows</a>
 
-1. Télécharger le dossier <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.1.0.0/windows" target="blank">.zip</a> de la dernière version.
-2. Dézipper le dossier.
-3. Exécuter le fichier <u>Hypload-Setup.exe</u>
-4. Servez vous de HypLoad !
+1. Téléchargez le fichier <a href="https://github.com/Hypocrate-code/HypLoad/raw/refs/heads/main/out/make/squirrel.windows/x64/HypLoad-1.0.0%20Setup.exe?download=">HypLoad-Setup.exe</a> de la pre-release.
+2. Executez <u>HypLoad-Setup.exe</u> et acceptez l'exécution (informations supplémentaire -> exécuter quand même).
+3. Utilisez HypLoad !
 
 Les téléchargements se retrouveront dans [ces dossiers](#fr-folders).
 
