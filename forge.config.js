@@ -29,18 +29,18 @@ module.exports = {
   },
   rebuildConfig: {},
   makers: [
-    {
-      name: '@electron-forge/maker-squirrel',
-      platforms: ['win32'],
-      config: {
-        loadingGif: "./assets/loading.gif",
-        appDirectory: "./",
-        exe: "HypLoad.exe",
-        iconUrl: 'https://github.com/Hypocrate-code/HypLoad/blob/main/assets/icon.ico?raw=true',
-        setupIcon: './assets/icon.ico',
-        noMsi: false
-      },
-    },
+    // {
+    //   name: '@electron-forge/maker-squirrel',
+    //   platforms: ['win32'],
+    //   config: {
+    //     loadingGif: "./assets/loading.gif",
+    //     appDirectory: "./",
+    //     exe: "HypLoad.exe",
+    //     iconUrl: 'https://github.com/Hypocrate-code/HypLoad/blob/main/assets/icon.ico?raw=true',
+    //     setupIcon: './assets/icon.ico',
+    //     noMsi: false
+    //   },
+    // },
     // {
     //   name: '@electron-forge/maker-zip',
     //   platforms: ['darwin'],
@@ -53,15 +53,15 @@ module.exports = {
     //     }
     //   },
     // },
-    // {
-    //   name: '@electron-forge/maker-dmg',
-    //   platforms: ['darwin'],
-    //   config: {
-    //     // background: './assets/icon.png',
-    //     icon: "./assets/icon.icns",
-    //     format: 'ULFO'
-    //   }
-    // },
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+      config: {
+        // background: './assets/icon.png',
+        icon: "./assets/icon.icns",
+        format: 'ULFO'
+      }
+    },
     // {
     //   name: '@electron-forge/maker-rpm',
     //   config: {},

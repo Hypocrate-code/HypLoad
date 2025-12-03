@@ -59,10 +59,9 @@ async function loadPlaylist(e, link) {
     sharedState.currentProcess = cmd.pid;
     
     cmd.stdout.on('data', (data) => {
-        const baseString = iconv.decode(data, 'windows1252').replaceAll(" | \n", " | ");
+        const baseString = data.toString().replaceAll(" | \n", " | ");
         const newData = baseString.split(' | ');
         newData.pop();
-        console.log("new d : ", newData);
         const chuckOfData = chunkArray(newData, size=9)
         chuckOfData.forEach(el => {
             console.log("un el : ", el);

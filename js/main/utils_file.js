@@ -20,6 +20,7 @@
 const path = require('node:path');
 const fs = require("fs");
 const { app } = require("electron");
+const { platform } = require('node:os');
 
 const OPTIONS_FILE_PATH = path.join(app.getPath('userData'), "config.json");
 const OPTIONS_DEFAULT_FILE_PATH = path.join(__dirname, "..", "..", "config-default.json");
@@ -72,7 +73,12 @@ function setOptions (options) {
 }
 
 async function isAlreadyDownloaded(e, title, onlyAudio, format, playlistName) {
+  if (platform() === "darwin") {title = sanitizeFilename(title)}
   const isPath = path.join(onlyAudio ? app.getPath('music') : app.getPath('videos'),'HypLoad', sanitizeFolderName(playlistName),`${title}.${format}`);;
+  console.log(isPath);
+  
+  console.log(fs.readdirSync( path.join(app.getPath('music'), "HypLoad", sanitizeFolderName(playlistName) )  ));
+  
   return new Promise((resolve) => {
     fs.access(isPath, fs.constants.F_OK, (err) => {
       if (err) {
@@ -89,18 +95,38 @@ async function isAlreadyDownloaded(e, title, onlyAudio, format, playlistName) {
 
 function sanitizeFolderName(name) {
   console.log('name', name);
-  const forbidden = /[<>:"/\\|?*\x00-\x1F]/g;
-  const reserved = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
-  let cleaned = name.replace(forbidden, "_").trim();
-  cleaned = cleaned.replace(/[ .]+$/g, "");
-  if (reserved.test(cleaned)) {
-    cleaned += "_playlist";
+  if (platform() === "darwin") {return sanitizeFilename(name)}
+  else {
+    const forbidden = /[<>:"/\\|?*\x00-\x1F]/g;
+    const reserved = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
+    let cleaned = name.replace(forbidden, "_").trim();
+    cleaned = cleaned.replace(/[ .]+$/g, "");
+    if (reserved.test(cleaned)) {
+      cleaned += "_playlist";
+    }
+    if (!cleaned.length) {
+      cleaned = "";
+    }
+    return cleaned;
   }
-  if (!cleaned.length) {
-    cleaned = "playlist";
-  }
-  return cleaned;
 }
+
+function sanitizeFilename(str) {
+  const map = {
+    '/': '／',
+    '\\': '＼',
+    ':': '：',
+    '*': '＊',
+    '?': '？',
+    '"': '＂',
+    '<': '＜',
+    '>': '＞',
+    '|': '｜'
+  };
+
+  return str.replace(/[\/\\:\*\?"<>|]/g, m => map[m]);
+}
+
 
 
 
