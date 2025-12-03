@@ -44,11 +44,11 @@ See [Features](#en-features).
 
 ### <a id="en-mac">macOS</a>
 
-1. Download the <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.1.0.0/mac" target="blank">.zip</a> folder of the latest release.
-2. Unzip the folder.
-3. Execute the <u>Hypload-Setup.dmg</u> file.
+1. Download the <a href="https://github.com/Hypocrate-code/HypLoad/raw/refs/heads/main/out/make/HypLoad-1.0.0-arm64.dmg?download=">.dmg</a> file of the latest release.
+2. Execute <u>HypLoad-x.x.x-arm64.dmg</u>.
 3. Place HypLoad in the */Applications* folder.
-4. Use HypLoad !
+4. Open a terminal and execute `sudo xattr -r -d com.apple.quarantine /Applications/HypLoad.app` to authorize HypLoad on your mac.
+5. Use HypLoad !
 
 Downloads will be available in [these folders](#en-folders).
 
@@ -204,9 +204,9 @@ Sert d'interface pour [yt-dlp](https://github.com/yt-dlp/yt-dlp) (inclus).
 
 ### <a id="fr-win">Windows</a>
 
-1. Téléchargez le fichier <a href="https://github.com/Hypocrate-code/HypLoad/raw/refs/heads/main/out/make/squirrel.windows/x64/HypLoad-1.0.0%20Setup.exe?download=">HypLoad-Setup.exe</a> de la pre-release.
-2. Executez <u>HypLoad-Setup.exe</u> et acceptez l'exécution (informations supplémentaire -> exécuter quand même).
-3. Utilisez HypLoad !
+1. Télécharger le fichier <a href="https://github.com/Hypocrate-code/HypLoad/raw/refs/heads/main/out/make/squirrel.windows/x64/HypLoad-1.0.0%20Setup.exe?download=">HypLoad-Setup.exe</a> de la dernière version.
+2. Exécuter <u>HypLoad-Setup.exe</u> et accepter l'exécution (Informations supplémentaire -> exécuter quand même).
+3. Utiliser HypLoad !
 
 Les téléchargements se retrouveront dans [ces dossiers](#fr-folders).
 
@@ -214,11 +214,11 @@ Voir [Fonctionnalités](#fr-features)
 
 ### <a id="fr-mac">macOS</a>
 
-1. Télécharger le dossier <a href="https://github.com/Hypocrate-code/HypLoad/releases/download/v.1.0.0/mac" target="blank">.zip</a> de la dernière version.
-2. Dézipper le dossier.
-3. Exécuter le fichier <u>Hypload-Setup.dmg</u>
+1. Télécharger le dossier <a href="https://github.com/Hypocrate-code/HypLoad/raw/refs/heads/main/out/make/HypLoad-1.0.0-arm64.dmg?download=">.dmg</a> de la dernière version.
+2. Exécuter le fichier <u>Hypload-x.x.x-arm64.dmg</u>.
 3. Placer HypLoad dans le dossier */Applications*
-4. Servez vous de HypLoad !
+4. Ouvrir un terminal et exécuter `sudo xattr -r -d com.apple.quarantine /Applications/HypLoad.app` pour autoriser HypLoad sur votre mac.
+5. Utilisez HypLoad !
 
 Les téléchargements se retrouveront dans [ces dossiers](#fr-folders).
 

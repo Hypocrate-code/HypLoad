@@ -28,7 +28,6 @@ export function setResolution(options) {
 export async function changeResolution(res) {
     window.hyploadAPI.changeResolution(res)
     window.hyploadAPI.getOptions().then(options => {
-        // console.log(options);
         setResolution(options);
     });
 }

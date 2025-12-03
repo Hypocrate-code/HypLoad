@@ -39,10 +39,6 @@ async function download(e, listLinks, folder) {
 
     const [link, onlyAudio] = listLinks[0];
 
-    console.log(link);
-    console.log(onlyAudio);
-    console.log(folder);
-
     console.log("Téléchargement lancé pour : ", link);
 
     webContents.send('update-progress-bar', "Start", listLinks.length !== 0 ? listLinks.length : null);
@@ -52,9 +48,6 @@ async function download(e, listLinks, folder) {
 
     const path_to_download = path.join(onlyAudio ? app.getPath('music') : app.getPath('videos'),'HypLoad', sanitizeFolderName(folder), '%(title)s.%(ext)s');
     
-    console.log(path_to_download);
-    console.log(PATH_TO_FFMPEG);
-    console.log(PATH_TO_YT_DLP);
 
     const audioParameters = ['-x',"--audio-format", options.audio_format , "-f", "ba"];
     const generalParameters = ["--embed-thumbnail", "--embed-metadata", '--no-playlist' ,"-o", path_to_download , '--ffmpeg-location', PATH_TO_FFMPEG, link]

@@ -23,6 +23,7 @@ const path = require('node:path');
 const sharedState = require('./sharedState');
 const { exec, spawn } = require('node:child_process');
 const iconv = require('iconv-lite');
+const { platform } = require('node:os');
 
 const PATH_TO_YT_DLP = app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked' ,'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp') : path.join(__dirname, '..', '..', 'bin', process.platform === "win32" ? 'win' : 'mac', process.platform === "win32" ? 'yt-dlp.exe' : 'yt-dlp');
 
@@ -59,12 +60,11 @@ async function loadPlaylist(e, link) {
     sharedState.currentProcess = cmd.pid;
     
     cmd.stdout.on('data', (data) => {
-        const baseString = data.toString().replaceAll(" | \n", " | ");
+        const baseString = platform() === "darwin" ? data.toString().replaceAll(" | \n", " | ") : iconv.decode(data, "win1252").replaceAll(" | \n", " | ");
         const newData = baseString.split(' | ');
         newData.pop();
         const chuckOfData = chunkArray(newData, size=9)
         chuckOfData.forEach(el => {
-            console.log("un el : ", el);
             const index = parseInt(el.length - 2);
             const total = parseInt(el.length - 1);
             title = el[5];

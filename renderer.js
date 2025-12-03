@@ -28,8 +28,7 @@ const playlistScreen = document.querySelector(".LoadedPlaylist");
 const titleOfPlaylist = playlistScreen.querySelector('p');
 
 window.addEventListener('DOMContentLoaded', async () => {
-    // Initial setup of options
-    console.log("Lancement");
+    console.log("Lancement HypLoad");
     window.hyploadAPI.getOptions().then(options => {
         setColorMode(options);
         setMusicOrVideoBtns(options);
@@ -247,8 +246,6 @@ window.hyploadAPI.onNewVideoData((videoData) => {
                 </svg>
             `
             const isAlready = await window.hyploadAPI.isAlreadyDownloaded(videoData[0], options.only_audio, options.only_audio ? options.audio_format : "mp4", videoData[5]);
-            // console.log("isAlready");
-            // console.log(isAlready);
             isAlready && newVideo.classList.add("notDownloadable");
             toDownloadBtn.addEventListener("click", ()=> {newVideo.classList.toggle("notDownloadable")});
 
@@ -279,12 +276,10 @@ async function resetSection(section) {
     setGateState("end");
     if (section.classList.contains('DownloadSingle')) {
         resetInputValue();
-        // console.log("Single download screen.");
         setP(await hyploadAPI.getText("video_label"));
     }
     else if (section.classList.contains('DownloadPlaylist')) {
         resetInputValue();
-        // console.log("Playlist download screen.");
         setP(await hyploadAPI.getText("playlist_label"));
     }
     else if (section.classList.contains("LoadedPlaylist")) {
@@ -306,7 +301,6 @@ function launchDownloadPlaylist() {
     videos.forEach(video => {
         !video.classList.contains("notDownloadable") && linksToDownload.push([video.getAttribute('link'), video.classList.contains("onlyAudio")]);
     });
-    // console.log(linksToDownload);
     const callback = (section) => {
         resetSection(section);
         window.hyploadAPI.download(linksToDownload, titleOfPlaylist.textContent.replace("HypLoad", ""));

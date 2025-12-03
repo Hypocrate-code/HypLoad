@@ -32,7 +32,6 @@ export function setColorMode(options) {
 
 export async function switchColorMode() {
     window.hyploadAPI.switchColorMode().then(options => {
-        // console.log(options);
         setColorMode(options);
     });
 }

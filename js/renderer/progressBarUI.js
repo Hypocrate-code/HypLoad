@@ -25,7 +25,6 @@ export function setProgressBarValue(value, section) {
             throw new Error("Progress bar n'existe pas.");
         }
         const child = progressBar.children[0];
-        // console.log("child :", child);
         if (!child) {
             throw new Error("Enfant de la progress bar n'existe pas.");
         }

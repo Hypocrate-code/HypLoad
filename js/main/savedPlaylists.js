@@ -22,9 +22,7 @@ const path = require('node:path');
 const fs = require("fs");
 
 const PLAYLISTS_FILE_PATH = path.join(app.getPath('userData'), "playlists.json");
-console.log(PLAYLISTS_FILE_PATH);
 const PLAYLISTS_DEFAULT_FILE_PATH = path.join(__dirname, "..", "..", "playlists-default.json");
-console.log(PLAYLISTS_DEFAULT_FILE_PATH);
 
 async function setNewLink(e, link, title) {
     const data = await getJSONFile(PLAYLISTS_FILE_PATH);

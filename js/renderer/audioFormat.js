@@ -28,7 +28,6 @@ export function setAudioFormat(options) {
 export async function changeAudioFormat(format) {
     window.hyploadAPI.changeAudioFormat(format)
     window.hyploadAPI.getOptions().then(options => {
-        // console.log(options);
         setAudioFormat(options);
     });
 }

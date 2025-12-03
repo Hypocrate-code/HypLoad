@@ -19,10 +19,7 @@
 export async function setPlaylists() {
     const btnContainer = document.querySelector('.Playlists .scrollContainer .btn-container');
     await window.hyploadAPI.getPlaylistLinks().then(data => {        
-        console.log(data.length);
-        console.log(data);
         if (data && Object.entries(data).length > 0) {
-            console.log(data);
             btnContainer.innerHTML = "";
             for (const [link, title] of Object.entries(data)) {
                 const btn = document.createElement('button');
