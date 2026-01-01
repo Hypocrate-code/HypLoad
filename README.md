@@ -1,4 +1,7 @@
-<img src="assets/logo_texte.png" height="100px">
+See the ad we made for it :
+
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/8oG4Cr6LbYA/0.jpg)](http://www.youtube.com/watch?v=8oG4Cr6LbYA "Video Title")
 
 <!-- <iframe src="youtube.com"> -->
 
@@ -334,3 +337,6 @@ L'algorithme de YouTube changeant régulièrement, HypLoad doit être également
 
 Cette version de HypLoad utilise la librairie [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 Merci à [lu'](https://instagram.com/jl.lucien) pour le GIF lors de l'installation sur Windows, ainsi que pour la publication du projet (video publicité & affiche).
+
+
+<img src="assets/logo_texte.png" height="100px">
