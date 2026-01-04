@@ -1,7 +1,12 @@
+
 See the ad we made for it :
 
 
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/8oG4Cr6LbYA/0.jpg)](http://www.youtube.com/watch?v=8oG4Cr6LbYA "Video Title")
+
+
+![GitHub all releases](https://img.shields.io/github/downloads/hypocrate-code/HypLoad/total)
+
 
 <!-- <iframe src="youtube.com"> -->
 
